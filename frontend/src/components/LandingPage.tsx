@@ -8,7 +8,7 @@ const LandingPage = () => {
   };
   const handleClick = async () => {
     await axios
-      .post(`http://localhost:5000/api/users/login`, login)
+      .post(`https://skillverse-z2r9.onrender.com/api/users/login`, login)
       .then((res) => {
         if (res.data) {
           console.log(res.data);
