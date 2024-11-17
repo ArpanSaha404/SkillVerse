@@ -1,10 +1,14 @@
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import User, { Iuser } from "../models/users";
+import { console } from "inspector";
 
 export const register = async (req: Request, res: Response): Promise<void> => {
-  const { fullName, email, password } = req.body;
+  const { fullName, email, password, confirmPassword } = req.body;
 
+  if (password === confirmPassword) {
+    res.status(400).json({ apiMsg: "Passwords are Different" });
+  }
   let { userType } = req.body;
   if (!userType) {
     userType = "Student";

@@ -9,6 +9,9 @@ module.exports = {
   theme: {
     extend: {
       colors: {
+        brwn: "var(--btnClr)",
+        hvrBrwn: "var(--hvrBtnClr)",
+        hdrBrwn: "var(--hdrBrwn)",
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",

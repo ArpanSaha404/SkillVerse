@@ -38,6 +38,11 @@ code {
     --destructive-foreground: 210 40% 98%;
     --ring: 215 20.2% 65.1%;
     --radius: 0.5rem;
+    --btnClr: #2a0800;
+    --hvrBtnClr: #775144;
+    --hdrBrwn: #c09891;
+    --lightBrwn: #bea8a7;
+    --lighterBrwn: #f4dbd8;
   }
 
   .dark {
