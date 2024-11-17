@@ -1,6 +1,5 @@
 import { Loader2, LockKeyhole, Mail, User } from "lucide-react";
 import { useState } from "react";
-import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { SignUpInputState, userSignUpSchema } from "./schema/userSchema";
 import { Link } from "react-router-dom";
@@ -70,14 +69,14 @@ const SignUp = () => {
         <form className="h-6/12 space-y-8 mb-2" onSubmit={handleSubmit}>
           <div className="mb-4">
             <div className="relative">
-              <Input
+              <input
                 type="text"
                 placeholder="Full Name"
                 name="fullName"
                 value={formData.fullName}
                 onChange={handleChange}
                 className="mt-1 block w-full px-12 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-hvrBrwn"
-              ></Input>
+              />
               <User className="absolute inset-y-2 left-2" />
               {errors && (
                 <span className="text-sm text-red-500">{errors.fullName}</span>
@@ -86,14 +85,14 @@ const SignUp = () => {
           </div>
           <div className="mb-4">
             <div className="relative">
-              <Input
+              <input
                 type="email"
                 placeholder="Email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
                 className="mt-1 block w-full px-12 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-hvrBrwn"
-              ></Input>
+              />
               <Mail className="absolute inset-y-2 left-2" />
               {errors && (
                 <span className="text-sm text-red-500">{errors.email}</span>
@@ -102,14 +101,14 @@ const SignUp = () => {
           </div>
           <div className="mb-4">
             <div className="relative">
-              <Input
+              <input
                 type="password"
                 placeholder="Password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
                 className="mt-1 block w-full px-12 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-hvrBrwn"
-              ></Input>
+              />
               <LockKeyhole className="absolute inset-y-2 left-2" />
               {errors && (
                 <span className="text-sm text-red-500">{errors.password}</span>
@@ -118,14 +117,14 @@ const SignUp = () => {
           </div>
           <div className="mb-4">
             <div className="relative">
-              <Input
+              <input
                 type="password"
                 placeholder="Confirm Password"
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleChange}
                 className="mt-1 block w-full px-12 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-hvrBrwn"
-              ></Input>
+              />
               <LockKeyhole className="absolute inset-y-2 left-2" />
               {errors && (
                 <span className="text-sm text-red-500">

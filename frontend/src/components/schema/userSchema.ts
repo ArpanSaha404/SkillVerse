@@ -43,3 +43,33 @@ export const userLoginSchema = z.object({
 });
 
 export type LoginInputState = z.infer<typeof userLoginSchema>;
+
+//Reset Password
+export const userResetPasswordSchema = z
+  .object({
+    password: z
+      .string()
+      .min(6, "Password should have a minimum of 6 characters")
+      .max(12, "Password can have max 12 characters"),
+    confirmPassword: z
+      .string()
+      .min(6, "Password should have a minimum of 6 characters")
+      .max(12, "Password can have max 12 characters"),
+  })
+  .refine(
+    (data) => {
+      if (
+        data.confirmPassword.length >= 6 &&
+        data.confirmPassword.length <= 12
+      ) {
+        return data.password === data.confirmPassword;
+      }
+      return true;
+    },
+    {
+      message: "Passwords must match",
+      path: ["confirmPassword"],
+    }
+  );
+
+export type ResetPasswordInputState = z.infer<typeof userResetPasswordSchema>;

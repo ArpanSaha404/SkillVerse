@@ -11,10 +11,10 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/signUp" element={<SignUp />} />
+          <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
-          <Route path="/verifyAccount" element={<Verifyaccount />} />
-          <Route path="/resetPasword" element={<ResetPassword />} />
+          <Route path="/verify-account" element={<Verifyaccount />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="*" element={<LandingPage />} />
         </Routes>
       </Router>

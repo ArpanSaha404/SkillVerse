@@ -25,102 +25,111 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 const Navbar = () => {
   const [isDark, setIsDark] = useState<boolean>(false);
   const fullName = "Implement Now";
-  const isLoading = true;
+  const isLoading = false;
   const isLoggedin = true;
   const isAdmin = true;
   const isTeacher = true;
   const boughtCourses = 5;
   const createdCourses = 5;
   return (
-    <div className="flex items-center justify-between bg-transparent mx-auto max-h-24 text-hvrBrwn mx-8 my-2">
-      <Link to="/">
-        <div className="divCenter font-bold h-12 text-xl active:scale-90 hover:underline">
-          <NotebookPen className="mr-3" />
-          SKILLVERSE
-        </div>
-      </Link>
-      {isLoggedin ? (
-        <div className="hidden md:divCenter gap-16 mx-8">
-          {isAdmin ? (
-            <Button className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out">
-              Admin Options
-            </Button>
-          ) : (
-            <></>
-          )}
-          <div className="divCenter text-xl font-semibold">
-            <Avatar className="mr-2 h-8 w-8">
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
-            {fullName.split(" ")[0]}
+    <div>
+      <div className="flex items-center justify-between bg-transparent mx-auto max-h-24 text-hvrBrwn mx-8 my-2">
+        <Link to="/">
+          <div className="divCenter font-bold h-12 text-xl active:scale-90 hover:underline">
+            <NotebookPen className="mr-3" />
+            SKILLVERSE
           </div>
-          <Button className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out">
-            Explore Courses
-          </Button>
-
-          <Menubar className="bg-white text-Brwn">
-            <MenubarMenu>
-              <MenubarTrigger>Profile & Courses</MenubarTrigger>
-              <MenubarContent>
-                <MenubarItem className="text-hvrBrwn text-md hover:underline hover:hdrBrwn">
-                  <Link to="/">Update Profile</Link>
-                </MenubarItem>
-                <MenubarItem className="text-hvrBrwn text-md hover:underline hover:hdrBrwn">
-                  <Link to="/">My Courses {"(" + boughtCourses + ")"}</Link>
-                </MenubarItem>
-                {isTeacher ? <MenubarSeparator /> : <></>}
-                {isTeacher ? (
-                  <MenubarItem className="text-hvrBrwn text-md hover:underline hover:hdrBrwn">
-                    <Link to="/">
-                      Created Courses {"(" + createdCourses + ")"}
-                    </Link>
-                  </MenubarItem>
-                ) : (
-                  <></>
-                )}
-                {isTeacher ? (
-                  <MenubarItem className="text-hvrBrwn text-md hover:underline hover:hdrBrwn">
-                    <Link to="/">My Dasboard</Link>
-                  </MenubarItem>
-                ) : (
-                  <></>
-                )}
-              </MenubarContent>
-            </MenubarMenu>
-          </Menubar>
-          <Button
-            className="bg-hvrBrwn hover:bg-hdrBrwn h-9 w-12 active:scale-90 transition-transform duration-300 ease-in-out"
-            onClick={() => setIsDark(!isDark)}
-          >
-            {isDark ? <Sun /> : <Moon />}
-          </Button>
-          {isLoading ? (
-            <Button
-              disabled
-              className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out"
-            >
-              <Loader2 className="animate-spin" />
-            </Button>
-          ) : (
+        </Link>
+        {isLoggedin ? (
+          <div className="hidden md:divCenter gap-8 mx-8">
+            {isAdmin ? (
+              <Button className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out">
+                Admin Options
+              </Button>
+            ) : (
+              <></>
+            )}
+            <div className="divCenter text-xl font-semibold">
+              <Avatar className="mr-2 h-8 w-8">
+                <AvatarImage src="https://github.com/shadcn.png" />
+                <AvatarFallback>CN</AvatarFallback>
+              </Avatar>
+              {fullName.split(" ")[0]}
+            </div>
             <Button className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out">
-              Log Out
+              Explore Courses
             </Button>
-          )}
+
+            <Menubar className="bg-white text-Brwn border-2 bolder-solid border-brwn shadow-lg hover:bg-hvrBrwn hover:text-white">
+              <MenubarMenu>
+                <MenubarTrigger>Profile & Courses</MenubarTrigger>
+                <MenubarContent>
+                  <MenubarItem className="text-hvrBrwn text-md hover:underline hover:hdrBrwn">
+                    <Link to="/">Update Profile</Link>
+                  </MenubarItem>
+                  <MenubarItem className="text-hvrBrwn text-md hover:underline hover:hdrBrwn">
+                    <Link to="/">My Courses {"(" + boughtCourses + ")"}</Link>
+                  </MenubarItem>
+                  {isTeacher ? <MenubarSeparator /> : <></>}
+                  {isTeacher ? (
+                    <MenubarItem className="text-hvrBrwn text-md hover:underline hover:hdrBrwn">
+                      <Link to="/">
+                        Created Courses {"(" + createdCourses + ")"}
+                      </Link>
+                    </MenubarItem>
+                  ) : (
+                    <></>
+                  )}
+                  {isTeacher ? (
+                    <MenubarItem className="text-hvrBrwn text-md hover:underline hover:hdrBrwn">
+                      <Link to="/">My Dasboard</Link>
+                    </MenubarItem>
+                  ) : (
+                    <></>
+                  )}
+                </MenubarContent>
+              </MenubarMenu>
+            </Menubar>
+            <Button
+              className="bg-hvrBrwn hover:bg-hdrBrwn h-9 w-12 active:scale-90 transition-transform duration-300 ease-in-out"
+              onClick={() => setIsDark(!isDark)}
+            >
+              {isDark ? <Sun /> : <Moon />}
+            </Button>
+            {isLoading ? (
+              <Button
+                disabled
+                className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out"
+              >
+                <Loader2 className="animate-spin" />
+              </Button>
+            ) : (
+              <Button className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out">
+                Log Out
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="hidden md:divCenter gap-16 mx-8">
+            <Button className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out">
+              Sign UP
+            </Button>
+            <Button className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out">
+              Log In
+            </Button>
+            <Button
+              className="bg-hvrBrwn hover:bg-hdrBrwn h-9 w-12 active:scale-90 transition-transform duration-300 ease-in-out"
+              onClick={() => setIsDark(!isDark)}
+            >
+              {isDark ? <Sun /> : <Moon />}
+            </Button>
+          </div>
+        )}
+        <div className="md:hidden lg:hidden">
+          <MobileNavbar />
         </div>
-      ) : (
-        <div className="hidden md:divCenter gap-16 mx-8">
-          <Button className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out">
-            Sign UP
-          </Button>
-          <Button className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out">
-            Log In
-          </Button>
-        </div>
-      )}
-      <div className="md:hidden lg:hidden">
-        <MobileNavbar />
       </div>
+      <Separator />
     </div>
   );
 };
