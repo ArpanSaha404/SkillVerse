@@ -2,7 +2,9 @@ import express, { Application, Response } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import mongoose from "mongoose";
-import userRoutes from "./routes/userRouter";
+import userRouter from "./routes/userRouter";
+import categoryRoutes from "./routes/CategoriesRoutes";
+import courseRoutes from "./routes/courseRoutes";
 import path from "path";
 
 dotenv.config();
@@ -15,10 +17,13 @@ app.use(cors());
 
 const _dirName = path.resolve();
 
-app.use("/api/users", userRoutes);
+app.use("/api/users", userRouter);
+app.use("/api/category", categoryRoutes);
+app.use("/api/course", courseRoutes);
 
 // Delete Later
 app.get("/test", (_, res: Response) => {
+  console.log("Hello");
   res.send("Server Started!!! This is a Test Link...");
 });
 

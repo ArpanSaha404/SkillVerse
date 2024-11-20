@@ -8,7 +8,7 @@ import {
   MenubarSeparator,
   MenubarTrigger,
 } from "./ui/menubar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import {
   Sheet,
@@ -24,6 +24,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 const Navbar = () => {
   const [isDark, setIsDark] = useState<boolean>(false);
+
+  const navigate = useNavigate();
   const fullName = "Implement Now";
   const isLoading = false;
   const isLoggedin = true;
@@ -35,7 +37,7 @@ const Navbar = () => {
     <div>
       <div className="flex items-center justify-between bg-transparent mx-auto max-h-24 text-hvrBrwn mx-8 my-2">
         <Link to="/">
-          <div className="divCenter font-bold h-12 text-xl active:scale-90 hover:underline">
+          <div className="divCenter ml-4 md:ml-16 font-bold h-12 text-xl active:scale-90 hover:underline">
             <NotebookPen className="mr-3" />
             SKILLVERSE
           </div>
@@ -111,10 +113,16 @@ const Navbar = () => {
           </div>
         ) : (
           <div className="hidden md:divCenter gap-16 mx-8">
-            <Button className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out">
+            <Button
+              onClick={() => navigate("signup")}
+              className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out"
+            >
               Sign UP
             </Button>
-            <Button className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out">
+            <Button
+              onClick={() => navigate("login")}
+              className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out"
+            >
               Log In
             </Button>
             <Button
@@ -140,7 +148,7 @@ const MobileNavbar = () => {
   const [isDark, setIsDark] = useState<boolean>(false);
   const fullName = "Implement Now";
   const isLoading = false;
-  const isLoggedin = true;
+  const isLoggedin = false;
   const isAdmin = true;
   const isTeacher = true;
   const boughtCourses = 5;
@@ -216,10 +224,10 @@ const MobileNavbar = () => {
                 </div>
               ) : (
                 <div className="flex items-center flex-col justify-start space-y-4">
-                  <Link to="/" className="w-full hover:underline">
+                  <Link to="/signup" className="w-full hover:underline">
                     Sign Up
                   </Link>
-                  <Link to="/" className="w-full hover:underline">
+                  <Link to="/login" className="w-full hover:underline">
                     Log In
                   </Link>
                 </div>

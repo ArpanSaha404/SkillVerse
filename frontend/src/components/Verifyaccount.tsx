@@ -55,6 +55,10 @@ const Verifyaccount = () => {
       <div className="flex-col divCenter">
         <h2 className="text-3xl font-bold text-center text-hdrBrwn mb-8 mt-16">
           Verify your Email
+          <br />
+          <h2 className="text-lg font-semibold text-center text-hdrBrwn mt-2">
+            Enter the 6 Digit Code sent to your Email
+          </h2>
         </h2>
         <form
           className="space-y-8 mb-2 divCenter flex-col"

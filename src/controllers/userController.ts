@@ -6,8 +6,9 @@ import { console } from "inspector";
 export const register = async (req: Request, res: Response): Promise<void> => {
   const { fullName, email, password, confirmPassword } = req.body;
 
-  if (password === confirmPassword) {
+  if (password !== confirmPassword) {
     res.status(400).json({ apiMsg: "Passwords are Different" });
+    return;
   }
   let { userType } = req.body;
   if (!userType) {
@@ -18,6 +19,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     if (userExists) {
       res.status(400).json({ apiMsg: "User Already Exists!!! Please Login" });
+      return;
     }
     const hashPassword = await bcrypt.hash(password, 10);
     const newUser: Iuser = new User({
@@ -39,18 +41,21 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const login = async (req: Request, res: Response): Promise<void> => {
+  console.log("Hello Login");
   const { email, password } = req.body;
-
   try {
     const user = await User.findOne({ email });
+
     if (!user || !user.password) {
       res
         .status(400)
         .json({ apiMsg: "User dosen't Exist!!! Please Sign Up First" });
+      return;
     } else {
       const isPasswordCorrect = await bcrypt.compare(password, user.password);
       if (!isPasswordCorrect) {
         res.status(400).json({ apiMsg: "Wrong Password!!!" });
+        return;
       }
       res.status(200).json({
         apiMsg: "Login Successfull",

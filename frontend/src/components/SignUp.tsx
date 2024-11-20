@@ -4,8 +4,9 @@ import { Button } from "./ui/button";
 import { SignUpInputState, userSignUpSchema } from "./schema/userSchema";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import { frontend_URL_dev } from "./lib/utils";
+import { frontend_URL } from "./lib/utils";
 import { Separator } from "./ui/separator";
+import Navbar from "./Navbar";
 
 const SignUp = () => {
   const [formData, setFormData] = useState<SignUpInputState>({
@@ -49,7 +50,7 @@ const SignUp = () => {
       setTypeError("");
     }
     await axios
-      .post(`${frontend_URL_dev}/api/users/register`, formData)
+      .post(`${frontend_URL}/api/users/register`, formData)
       .then((res) => {
         if (res.data) {
           setFormResponse(res.data.apiMsg);
@@ -61,9 +62,10 @@ const SignUp = () => {
   };
 
   return (
-    <div className="max-w-screen mx-auto p-6 bg-white rounded-lg shadow-lg min-h-screen space-y-8 text-hvrBrwn">
+    <div className="max-w-screen mx-auto p-6 bg-white rounded-lg shadow-lg min-h-screen space-y-2 text-hvrBrwn">
+      <Navbar />
       <div className="flex-col divCenter">
-        <h2 className="text-3xl font-bold text-center text-hdrBrwn mb-8 mt-16">
+        <h2 className="text-3xl font-bold text-center text-hdrBrwn mb-4">
           Sign Up
         </h2>
         <form className="h-6/12 space-y-8 mb-2" onSubmit={handleSubmit}>
@@ -135,7 +137,7 @@ const SignUp = () => {
           </div>
           <div className="mb-4">
             <label htmlFor="userType" className="block text-sm font-medium">
-              Gender
+              User Type
             </label>
             <select
               id="userType"
@@ -177,13 +179,13 @@ const SignUp = () => {
         <div className="mt-2 text-black dark:text-white divCenter flex-col">
           <div>
             Already have an account?{" "}
-            <Link to="/" className="underline text-blue-500">
+            <Link to="/login" className="underline text-blue-500">
               Log in
             </Link>
           </div>
           <div>
             Just Created your Account?{" "}
-            <Link to="/" className="underline text-blue-500">
+            <Link to="/verify-account" className="underline text-blue-500">
               Verify your Account
             </Link>
           </div>

@@ -59,7 +59,13 @@ const LandingPage = () => {
                   <Loader2 className="animate-spin" />
                 </Button>
               )}
+
               <div className="hidden">We have 30k+ Courses...</div>
+            </div>
+            <div className="text-center flex items-center justify-around">
+              <Button className="h-10 w-auto divCenter bg-brwn text-white rounded-md hover:bg-hvrBrwn transition-transform duration-300 ease-in-out active:scale-90">
+                Explore All Courses <MoveRight className="pl-2" />
+              </Button>
             </div>
           </div>
         </div>

@@ -1,11 +1,13 @@
-import mongoose, { Schema, Document } from "mongoose";
+import mongoose, { Document } from "mongoose";
 
 export interface Iuser extends Document {
   fullName: string;
   email: string;
+  pic?: string;
   password: string;
   userType: string;
   isAdmin: boolean;
+  coursesBought?: mongoose.Schema.Types.ObjectId[];
 }
 
 export enum userTypes {
@@ -23,6 +25,10 @@ const UserSchema = new mongoose.Schema<Iuser>(
       type: String,
       unique: true,
       required: true,
+    },
+    pic: {
+      type: String,
+      default: "",
     },
     password: {
       type: String,
