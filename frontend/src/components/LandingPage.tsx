@@ -2,23 +2,25 @@ import { Button } from "./ui/button";
 import React, { useState } from "react";
 import { Loader2, MoveRight } from "lucide-react";
 import Navbar from "./Navbar";
+import { useAppSelector } from "../app/hooks";
 
 const LandingPage = () => {
   const [SearchText, setSearchText] = useState<string>("");
   const isLoading = true;
-  const isLoggedin = false;
-
+  const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
   const changeInputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setSearchText(e.target.value);
   };
 
   const handleSearchClick = () => {
-    if (!isLoggedin) {
+    if (!isLoggedIn) {
       alert("Please Login or Signup First to See all Courses");
       return;
     }
   };
+
+  console.log(isLoggedIn);
 
   return (
     <div className="h-screen">

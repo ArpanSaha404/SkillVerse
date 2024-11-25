@@ -21,20 +21,44 @@ import {
 } from "./ui/sheet";
 import { Separator } from "./ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { useLazyLogOutUserQuery } from "../features/api/authApi";
+import { toast, Toaster } from "sonner";
+import { toastStyles } from "./toastStyles";
+import { useAppSelector } from "../app/hooks";
 
 const Navbar = () => {
   const [isDark, setIsDark] = useState<boolean>(false);
 
+  const [logOutUser, { isLoading }] = useLazyLogOutUserQuery();
+
   const navigate = useNavigate();
+  const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+
   const fullName = "Implement Now";
-  const isLoading = false;
-  const isLoggedin = true;
   const isAdmin = true;
   const isTeacher = true;
   const boughtCourses = 5;
   const createdCourses = 5;
+
+  const handleLogout = async () => {
+    try {
+      const res = await logOutUser().unwrap();
+      toast.success(res.apiMsg, {
+        style: toastStyles.success,
+      });
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (error: any) {
+      toast.error(error.data.apiMsg, {
+        style: toastStyles.error,
+      });
+    }
+  };
+
   return (
     <div>
+      <Toaster />
       <div className="flex items-center justify-between bg-transparent mx-auto max-h-24 text-hvrBrwn mx-8 my-2">
         <Link to="/">
           <div className="divCenter ml-4 md:ml-16 font-bold h-12 text-xl active:scale-90 hover:underline">
@@ -42,7 +66,7 @@ const Navbar = () => {
             SKILLVERSE
           </div>
         </Link>
-        {isLoggedin ? (
+        {isLoggedIn ? (
           <div className="hidden md:divCenter gap-8 mx-8">
             {isAdmin ? (
               <Button className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out">
@@ -98,16 +122,19 @@ const Navbar = () => {
             >
               {isDark ? <Sun /> : <Moon />}
             </Button>
-            {isLoading ? (
+            {!isLoading ? (
+              <Button
+                onClick={handleLogout}
+                className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out"
+              >
+                Log Out
+              </Button>
+            ) : (
               <Button
                 disabled
                 className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out"
               >
                 <Loader2 className="animate-spin" />
-              </Button>
-            ) : (
-              <Button className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out">
-                Log Out
               </Button>
             )}
           </div>
@@ -146,13 +173,35 @@ export default Navbar;
 
 const MobileNavbar = () => {
   const [isDark, setIsDark] = useState<boolean>(false);
+
+  const [logOutUser, { isLoading }] = useLazyLogOutUserQuery();
+
+  const navigate = useNavigate();
+
+  const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+
   const fullName = "Implement Now";
-  const isLoading = false;
-  const isLoggedin = false;
   const isAdmin = true;
   const isTeacher = true;
   const boughtCourses = 5;
   const createdCourses = 5;
+
+  const handleLogout = async () => {
+    try {
+      const res = await logOutUser().unwrap();
+      toast.success(res.apiMsg, {
+        style: toastStyles.success,
+      });
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (error: any) {
+      toast.error(error.data.apiMsg, {
+        style: toastStyles.error,
+      });
+    }
+  };
+
   return (
     <div>
       <Sheet>
@@ -165,7 +214,7 @@ const MobileNavbar = () => {
           <SheetHeader className="my-8">
             <SheetTitle className="flex items-center justify-between">
               <h1>
-                {isLoggedin ? (
+                {isLoggedIn ? (
                   <div className="divCenter">
                     <Avatar className="mr-2 h-8 w-8">
                       <AvatarImage src="https://github.com/shadcn.png" />
@@ -197,7 +246,7 @@ const MobileNavbar = () => {
               ) : (
                 <></>
               )}
-              {isLoggedin ? (
+              {isLoggedIn ? (
                 <div className="flex items-center flex-col justify-start space-y-4">
                   <Link to="/" className="w-full hover:underline">
                     Update Profile
@@ -235,14 +284,17 @@ const MobileNavbar = () => {
             </div>
           </SheetDescription>
           <SheetFooter>
-            {isLoading ? (
+            {!isLoading ? (
+              <Button
+                onClick={handleLogout}
+                className="w-full bg-hvrBrwn hover:bg-hdrBrwn"
+              >
+                Log Out
+              </Button>
+            ) : (
               <Button disabled className="w-full bg-hvrBrwn hover:bg-hdrBrwn">
                 <Loader2 className="animate-spin mr-4" />
                 Please Wait...
-              </Button>
-            ) : (
-              <Button className="w-full bg-hvrBrwn hover:bg-hdrBrwn">
-                Log Out
               </Button>
             )}
           </SheetFooter>

@@ -1,6 +1,7 @@
 import express, { Application, Response } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import userRouter from "./routes/userRouter";
 import categoryRoutes from "./routes/CategoriesRoutes";
@@ -13,6 +14,8 @@ const app: Application = express();
 const PORT = process.env.PORT || 8000;
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 app.use(cors());
 
 const _dirName = path.resolve();

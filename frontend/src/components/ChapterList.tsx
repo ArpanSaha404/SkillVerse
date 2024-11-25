@@ -1,5 +1,5 @@
 import { LockKeyhole, LockKeyholeOpen, TableOfContents } from "lucide-react";
-import { chapterType } from "./types/courses";
+import { chapterType } from "../types/courses";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import {

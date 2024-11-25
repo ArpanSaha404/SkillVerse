@@ -1,10 +1,10 @@
 import { BookOpen } from "lucide-react";
 import FilterCategories from "./FilterCategories";
-import useFetch from "./lib/useFetch";
+import useFetch from "../hooks/useFetch";
 import { frontend_URL } from "./lib/utils";
 import Loading from "./Loading";
 import Navbar from "./Navbar";
-import { courseType } from "./types/courses";
+import { courseType } from "../types/courses";
 
 const CoursesPage = () => {
   const [courseData] = useFetch(`${frontend_URL}/api/course/course`);

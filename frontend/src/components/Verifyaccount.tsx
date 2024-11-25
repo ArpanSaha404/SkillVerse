@@ -3,12 +3,13 @@ import React, { useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import Navbar from "./Navbar";
+import axios from "axios";
 
 const Verifyaccount = () => {
   const [formData, setFormData] = useState<string[]>(["", "", "", "", "", ""]);
   const [otpErrors, setOtpErrors] = useState<string>("");
   const inputRef = useRef<any>([]);
-  const email = "1stUser@gmail.com";
+  const email = "arpan50saha@gmail.com";
 
   const isLoading = true;
 
@@ -39,7 +40,7 @@ const Verifyaccount = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const otp = formData.join("");
+    const otp = formData.join("").toString();
     if (otp.length !== 6) {
       setOtpErrors(
         "OTP Submitted does not have 6 characters... Please Enter OTP Again"
@@ -47,6 +48,24 @@ const Verifyaccount = () => {
       setFormData(["", "", "", "", "", ""]);
       return;
     }
+
+    console.log(otp);
+
+    const data = {
+      email,
+      otp,
+    };
+
+    await axios
+      .patch(`http://localhost:5000/api/users/verify-account`, data)
+      .then((res) => {
+        if (res.data) {
+          console.log(res.data);
+        }
+      })
+      .catch((error: any) => {
+        console.log(error);
+      });
   };
 
   return (
@@ -113,6 +132,21 @@ const Verifyaccount = () => {
             </Button>
           )}
         </form>
+        {isLoading ? (
+          <Button
+            type="submit"
+            className="w-auto py-2 mt-4 bg-brwn text-white rounded-md hover:bg-hvrBrwn transition-transform duration-300 ease-in-out active:scale-90"
+          >
+            Send OTP Again
+          </Button>
+        ) : (
+          <Button
+            disabled
+            className=" divCenter gap-4 w-auto py-2 mt-4 bg-hdrBrwn text-white rounded-md"
+          >
+            <Loader2 className="animate-spin" /> Please Wait...
+          </Button>
+        )}
         <div className="text-semibold mt-2 text-red-500">{otpErrors}</div>
       </div>
     </div>

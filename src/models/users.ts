@@ -6,6 +6,7 @@ export interface Iuser extends Document {
   pic?: string;
   password: string;
   userType: string;
+  isVerified: boolean;
   isAdmin: boolean;
   coursesBought?: mongoose.Schema.Types.ObjectId[];
 }
@@ -42,6 +43,10 @@ const UserSchema = new mongoose.Schema<Iuser>(
         values: Object.values(userTypes),
         message: `userType is Not a Valid Value`,
       },
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
     },
     isAdmin: {
       type: Boolean,

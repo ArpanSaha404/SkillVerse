@@ -6,7 +6,7 @@ import Navbar from "./Navbar";
 import {
   ResetPasswordInputState,
   userResetPasswordSchema,
-} from "./schema/userSchema";
+} from "../schema/userSchema";
 
 const ResetPassword = () => {
   const [formData, setFormData] = useState<ResetPasswordInputState>({

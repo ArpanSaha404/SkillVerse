@@ -1,12 +1,13 @@
 import { Loader2, LockKeyhole, Mail, User } from "lucide-react";
 import { useState } from "react";
 import { Button } from "./ui/button";
-import { SignUpInputState, userSignUpSchema } from "./schema/userSchema";
-import { Link } from "react-router-dom";
-import axios from "axios";
-import { frontend_URL } from "./lib/utils";
+import { SignUpInputState, userSignUpSchema } from "../schema/userSchema";
+import { Link, useNavigate } from "react-router-dom";
 import { Separator } from "./ui/separator";
 import Navbar from "./Navbar";
+import { useRegisterUserMutation } from "../features/api/authApi";
+import { toast, Toaster } from "sonner";
+import { toastStyles } from "./toastStyles";
 
 const SignUp = () => {
   const [formData, setFormData] = useState<SignUpInputState>({
@@ -17,10 +18,11 @@ const SignUp = () => {
     userType: "",
   });
   const [typeError, setTypeError] = useState<string>("");
-  const [formResponse, setFormResponse] = useState<string>("");
   const [errors, SetErrors] = useState<Partial<SignUpInputState>>({});
 
-  const isLoading = true;
+  const [registerUser, { isLoading }] = useRegisterUserMutation();
+
+  const navigate = useNavigate();
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -49,21 +51,25 @@ const SignUp = () => {
     } else {
       setTypeError("");
     }
-    await axios
-      .post(`${frontend_URL}/api/users/register`, formData)
-      .then((res) => {
-        if (res.data) {
-          setFormResponse(res.data.apiMsg);
-        }
-      })
-      .catch((error) => {
-        setFormResponse(error.response.data.apiMsg);
+    try {
+      const res = await registerUser(formData).unwrap();
+      toast.success(res.apiMsg, {
+        style: toastStyles.success,
       });
+      setTimeout(() => {
+        navigate("/verify-account");
+      }, 1000);
+    } catch (error: any) {
+      toast.error(error.data.apiMsg, {
+        style: toastStyles.error,
+      });
+    }
   };
 
   return (
     <div className="max-w-screen mx-auto p-6 bg-white rounded-lg shadow-lg min-h-screen space-y-2 text-hvrBrwn">
       <Navbar />
+      <Toaster />
       <div className="flex-col divCenter">
         <h2 className="text-3xl font-bold text-center text-hdrBrwn mb-4">
           Sign Up
@@ -158,7 +164,7 @@ const SignUp = () => {
               </>
             )}
           </div>
-          {isLoading ? (
+          {!isLoading ? (
             <Button
               type="submit"
               className="w-full py-2 mt-4 bg-brwn text-white rounded-md hover:bg-hvrBrwn transition-transform duration-300 ease-in-out active:scale-90"
@@ -174,7 +180,6 @@ const SignUp = () => {
             </Button>
           )}
         </form>
-        <div className="text-semibold mt-2 text-red-500">{formResponse}</div>
         <Separator />
         <div className="mt-2 text-black dark:text-white divCenter flex-col">
           <div>

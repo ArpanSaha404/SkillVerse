@@ -1,8 +1,8 @@
 import { Filter, Loader2, MoveDown, MoveUp } from "lucide-react";
-import useFetch from "../components/lib/useFetch";
+import useFetch from "../hooks/useFetch";
 import { frontend_URL } from "./lib/utils";
 import Loading from "./Loading";
-import { category } from "./types/courseCategories";
+import { category } from "../types/courseCategories";
 import { Button } from "./ui/button";
 import { Checkbox } from "./ui/checkbox";
 import {

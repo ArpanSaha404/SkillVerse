@@ -1,9 +1,9 @@
 import { CircleCheckBig, IndianRupee } from "lucide-react";
 import ChapterList from "./ChapterList";
-import useFetch from "./lib/useFetch";
+import useFetch from "../hooks/useFetch";
 import Loading from "./Loading";
 import Navbar from "./Navbar";
-import { chapterType } from "./types/courses";
+import { chapterType } from "../types/courses";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 

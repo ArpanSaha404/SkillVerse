@@ -1,5 +1,5 @@
 import { IndianRupee } from "lucide-react";
-import useFetch from "./lib/useFetch";
+import useFetch from "../hooks/useFetch";
 import Loading from "./Loading";
 import Navbar from "./Navbar";
 import { Button } from "./ui/button";
