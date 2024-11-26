@@ -33,10 +33,13 @@ const Navbar = () => {
 
   const navigate = useNavigate();
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+  const isVerified = useAppSelector((state) => state.auth.isVerified);
+  const fullName = useAppSelector((state) => state.auth.fullName);
+  const pic = useAppSelector((state) => state.auth.pic);
+  const isAdmin = useAppSelector((state) => state.auth.isAdmin);
+  const isTeacher =
+    useAppSelector((state) => state.auth.userType) === "Teacher" ? true : false;
 
-  const fullName = "Implement Now";
-  const isAdmin = true;
-  const isTeacher = true;
   const boughtCourses = 5;
   const createdCourses = 5;
 
@@ -66,7 +69,7 @@ const Navbar = () => {
             SKILLVERSE
           </div>
         </Link>
-        {isLoggedIn ? (
+        {isLoggedIn && isVerified ? (
           <div className="hidden md:divCenter gap-8 mx-8">
             {isAdmin ? (
               <Button className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out">
@@ -77,12 +80,20 @@ const Navbar = () => {
             )}
             <div className="divCenter text-xl font-semibold">
               <Avatar className="mr-2 h-8 w-8">
-                <AvatarImage src="https://github.com/shadcn.png" />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarImage src={pic} />
+                <AvatarFallback>
+                  {fullName
+                    .split(" ")
+                    .map((data) => data[0])
+                    .join("")}
+                </AvatarFallback>
               </Avatar>
               {fullName.split(" ")[0]}
             </div>
-            <Button className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out">
+            <Button
+              onClick={() => navigate("/courses")}
+              className="bg-hvrBrwn hover:bg-hdrBrwn active:scale-90 transition-transform duration-300 ease-in-out"
+            >
               Explore Courses
             </Button>
 
@@ -177,12 +188,14 @@ const MobileNavbar = () => {
   const [logOutUser, { isLoading }] = useLazyLogOutUserQuery();
 
   const navigate = useNavigate();
-
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
+  const isVerified = useAppSelector((state) => state.auth.isVerified);
+  const fullName = useAppSelector((state) => state.auth.fullName);
+  const pic = useAppSelector((state) => state.auth.pic);
+  const isAdmin = useAppSelector((state) => state.auth.isAdmin);
+  const isTeacher =
+    useAppSelector((state) => state.auth.userType) === "Teacher" ? true : false;
 
-  const fullName = "Implement Now";
-  const isAdmin = true;
-  const isTeacher = true;
   const boughtCourses = 5;
   const createdCourses = 5;
 
@@ -214,11 +227,16 @@ const MobileNavbar = () => {
           <SheetHeader className="my-8">
             <SheetTitle className="flex items-center justify-between">
               <h1>
-                {isLoggedIn ? (
+                {isLoggedIn && isVerified ? (
                   <div className="divCenter">
                     <Avatar className="mr-2 h-8 w-8">
-                      <AvatarImage src="https://github.com/shadcn.png" />
-                      <AvatarFallback>CN</AvatarFallback>
+                      <AvatarImage src={pic} />
+                      <AvatarFallback>
+                        {fullName
+                          .split(" ")
+                          .map((data) => data[0])
+                          .join("")}
+                      </AvatarFallback>
                     </Avatar>
                     {fullName.split(" ")[0]}
                   </div>
@@ -251,7 +269,7 @@ const MobileNavbar = () => {
                   <Link to="/" className="w-full hover:underline">
                     Update Profile
                   </Link>
-                  <Link to="/" className="w-full hover:underline">
+                  <Link to="/courses" className="w-full hover:underline">
                     Explore All Courses
                   </Link>
                   <Link to="/" className="w-full hover:underline">

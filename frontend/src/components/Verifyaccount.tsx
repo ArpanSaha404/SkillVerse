@@ -3,15 +3,31 @@ import React, { useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import Navbar from "./Navbar";
-import axios from "axios";
+import { useAppSelector } from "../app/hooks";
+import {
+  useSendMailMutation,
+  useVerifyAccountMutation,
+} from "../features/api/authApi";
+import { toast, Toaster } from "sonner";
+import { toastStyles } from "./toastStyles";
+import {
+  responseType,
+  sendMailType,
+  verifyAccountInputType,
+  verifyAccountType,
+} from "../types/user";
+import { useNavigate } from "react-router-dom";
 
 const Verifyaccount = () => {
   const [formData, setFormData] = useState<string[]>(["", "", "", "", "", ""]);
   const [otpErrors, setOtpErrors] = useState<string>("");
   const inputRef = useRef<any>([]);
-  const email = "arpan50saha@gmail.com";
 
-  const isLoading = true;
+  const [verifyAccount, { isLoading }] = useVerifyAccountMutation();
+  const [sendMail, { isLoading: isMailSentLoading }] = useSendMailMutation();
+
+  const navigate = useNavigate();
+  const email = useAppSelector((state) => state.auth.email);
 
   const handleChange = (idx: number, val: string) => {
     if (/^[a-zA-Z0-9]$/.test(val) || val === "") {
@@ -38,6 +54,20 @@ const Verifyaccount = () => {
     }
   };
 
+  const handleSendMailAgain = async () => {
+    const inputData: sendMailType = { email, mailType: "verifyAccount" };
+    try {
+      const res: responseType = await sendMail(inputData).unwrap();
+      toast.success(res.apiMsg, {
+        style: toastStyles.success,
+      });
+    } catch (error: any) {
+      toast.error(error.data.apiMsg, {
+        style: toastStyles.error,
+      });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const otp = formData.join("").toString();
@@ -49,28 +79,27 @@ const Verifyaccount = () => {
       return;
     }
 
-    console.log(otp);
+    const inputData: verifyAccountInputType = { email, otp };
 
-    const data = {
-      email,
-      otp,
-    };
-
-    await axios
-      .patch(`http://localhost:5000/api/users/verify-account`, data)
-      .then((res) => {
-        if (res.data) {
-          console.log(res.data);
-        }
-      })
-      .catch((error: any) => {
-        console.log(error);
+    try {
+      const res: verifyAccountType = await verifyAccount(inputData).unwrap();
+      toast.success(res.apiMsg, {
+        style: toastStyles.success,
       });
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (error: any) {
+      toast.error(error.data.apiMsg, {
+        style: toastStyles.error,
+      });
+    }
   };
 
   return (
     <div className="max-w-screen mx-auto p-6 bg-white rounded-lg shadow-lg min-h-screen space-y-8 text-hvrBrwn">
       <Navbar />
+      <Toaster />
       <div className="flex-col divCenter">
         <h2 className="text-3xl font-bold text-center text-hdrBrwn mb-8 mt-16">
           Verify your Email
@@ -116,7 +145,7 @@ const Verifyaccount = () => {
               />
             ))}
           </div>
-          {isLoading ? (
+          {!isLoading ? (
             <Button
               type="submit"
               className="w-auto py-2 mt-4 bg-brwn text-white rounded-md hover:bg-hvrBrwn transition-transform duration-300 ease-in-out active:scale-90"
@@ -132,8 +161,9 @@ const Verifyaccount = () => {
             </Button>
           )}
         </form>
-        {isLoading ? (
+        {!isMailSentLoading ? (
           <Button
+            onClick={handleSendMailAgain}
             type="submit"
             className="w-auto py-2 mt-4 bg-brwn text-white rounded-md hover:bg-hvrBrwn transition-transform duration-300 ease-in-out active:scale-90"
           >

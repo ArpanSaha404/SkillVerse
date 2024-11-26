@@ -1,8 +1,15 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface authInputState {
-  fullName: string;
+interface authNotVerifiedState {
   email: string;
+}
+
+interface authInputState extends authNotVerifiedState {
+  fullName: string;
+  pic: string;
+  userType: string;
+  isAdmin: boolean;
+  isVerified: boolean;
 }
 
 interface authState extends authInputState {
@@ -12,6 +19,10 @@ interface authState extends authInputState {
 const initialState: authState = {
   fullName: "",
   email: "",
+  pic: "",
+  userType: "Student",
+  isAdmin: false,
+  isVerified: false,
   isLoggedIn: false,
 };
 
@@ -19,14 +30,17 @@ export const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    signup: (state, action: PayloadAction<authInputState>) => {
-      state.fullName = action.payload.fullName;
+    signup: (state, action: PayloadAction<authNotVerifiedState>) => {
       state.email = action.payload.email;
       state.isLoggedIn = false;
     },
     login: (state, action: PayloadAction<authInputState>) => {
-      state.fullName = action.payload.fullName;
       state.email = action.payload.email;
+      state.fullName = action.payload.fullName;
+      state.pic = action.payload.pic;
+      state.userType = action.payload.userType;
+      state.isAdmin = action.payload.isAdmin;
+      state.isVerified = action.payload.isVerified;
       state.isLoggedIn = true;
     },
     logout: (state) => {
@@ -39,5 +53,5 @@ export const authSlice = createSlice({
 
 const authReducer = authSlice.reducer;
 
-export const { login, logout } = authSlice.actions;
+export const { signup, login, logout } = authSlice.actions;
 export default authReducer;

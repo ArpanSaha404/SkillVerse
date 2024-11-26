@@ -8,6 +8,7 @@ import Navbar from "./Navbar";
 import { useLoginUserMutation } from "../features/api/authApi";
 import { toast, Toaster } from "sonner";
 import { toastStyles } from "./toastStyles";
+import { loginUserType } from "../types/user";
 
 const Login = () => {
   const [formData, setFormData] = useState<LoginInputState>({
@@ -40,8 +41,7 @@ const Login = () => {
     }
 
     try {
-      const res = await loginUser(formData).unwrap();
-      toast("hello");
+      const res: loginUserType = await loginUser(formData).unwrap();
       toast.success(res.apiMsg, {
         style: toastStyles.success,
       });

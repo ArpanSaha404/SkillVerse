@@ -7,23 +7,35 @@ import {
   ResetPasswordInputState,
   userResetPasswordSchema,
 } from "../schema/userSchema";
+import { useAppSelector } from "../app/hooks";
+import {
+  useResetPasswordMutation,
+  useSendMailMutation,
+} from "../features/api/authApi";
+import { responseType, sendMailType } from "../types/user";
+import { toast, Toaster } from "sonner";
+import { toastStyles } from "./toastStyles";
+import { useNavigate } from "react-router-dom";
 
 const ResetPassword = () => {
   const [formData, setFormData] = useState<ResetPasswordInputState>({
+    email: "",
+    otp: "",
     password: "",
     confirmPassword: "",
   });
-  const [formResponse, setFormResponse] = useState<string>("");
   const [errors, SetErrors] = useState<Partial<ResetPasswordInputState>>({});
   const [otpData, setOtpData] = useState<string[]>(["", "", "", "", "", ""]);
   const [otpErrors, setOtpErrors] = useState<string>("");
+  const [isSentOnce, setIsSentOnce] = useState<boolean>(false);
   const [isFieldsVisible, setIsFieldsVisible] = useState<boolean>(false);
   const inputRef = useRef<any>([]);
-  const email = "1stUser@gmail.com";
-  let isMailSent = true;
-  let isSentOnce = false;
 
-  const isLoading = true;
+  const [resetPassword, { isLoading }] = useResetPasswordMutation();
+  const [sendMail, { isLoading: isMailSentLoading }] = useSendMailMutation();
+
+  const navigate = useNavigate();
+  const email = useAppSelector((state) => state.auth.email);
 
   const handleOTPChange = (idx: number, val: string) => {
     if (/^[a-zA-Z0-9]$/.test(val) || val === "") {
@@ -58,14 +70,24 @@ const ResetPassword = () => {
     }));
   };
 
-  const handleEmailSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSendMailAgain = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    isSentOnce = true;
-    //Send Email
+    const inputData: sendMailType = { email, mailType: "resetPassword" };
+    try {
+      const res: responseType = await sendMail(inputData).unwrap();
+      toast.success(res.apiMsg, {
+        style: toastStyles.success,
+      });
+    } catch (error: any) {
+      toast.error(error.data.apiMsg, {
+        style: toastStyles.error,
+      });
+    }
+    setIsSentOnce(true);
     setIsFieldsVisible(true);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const otp = otpData.join("");
     if (otp.length !== 6) {
@@ -75,6 +97,7 @@ const ResetPassword = () => {
       setOtpData(["", "", "", "", "", ""]);
       return;
     }
+    setFormData((prevData) => ({ ...prevData, email: email, otp: otp }));
 
     const result = userResetPasswordSchema.safeParse(formData);
     if (!result.success) {
@@ -82,14 +105,25 @@ const ResetPassword = () => {
       SetErrors(fieldErrors as Partial<ResetPasswordInputState>);
       return;
     }
-
-    //For Form Response Warning...Delete Later
-    setFormResponse("");
+    try {
+      const res: responseType = await resetPassword(formData).unwrap();
+      toast.success(res.apiMsg, {
+        style: toastStyles.success,
+      });
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    } catch (error: any) {
+      toast.error(error.data.apiMsg, {
+        style: toastStyles.error,
+      });
+    }
   };
 
   return (
     <div className="max-w-screen mx-auto p-6 bg-white rounded-lg shadow-lg min-h-screen space-y-8 text-hvrBrwn">
       <Navbar />
+      <Toaster />
       <div className="flex-col divCenter">
         <h2 className="text-3xl font-bold text-center text-hdrBrwn mb-8">
           Reset your Password
@@ -100,7 +134,7 @@ const ResetPassword = () => {
         </h2>
         <form
           className="space-y-8 mb-2 divCenter flex-col"
-          onSubmit={handleEmailSubmit}
+          onSubmit={handleSendMailAgain}
         >
           <div className="mb-4">
             <div className="relative">
@@ -116,7 +150,7 @@ const ResetPassword = () => {
               <Mail className="absolute inset-y-2 left-2" />
             </div>
           </div>
-          {isMailSent ? (
+          {!isMailSentLoading ? (
             <Button
               type="submit"
               className="w-auto py-2 mt-4 bg-brwn text-white rounded-md hover:bg-hvrBrwn transition-transform duration-300 ease-in-out active:scale-90"
@@ -138,7 +172,7 @@ const ResetPassword = () => {
         >
           <div>
             {isFieldsVisible ? (
-              <div>
+              <div className="md:divCenter flex-col">
                 <div className="mb-4 divCenter">
                   {otpData.map((data: string, idx: number) => (
                     <input
@@ -197,7 +231,7 @@ const ResetPassword = () => {
                 <div className="text-semibold mt-2 text-red-500">
                   {otpErrors}
                 </div>
-                {isLoading ? (
+                {!isLoading ? (
                   <Button
                     type="submit"
                     className="w-auto py-2 mt-4 bg-brwn text-white rounded-md hover:bg-hvrBrwn transition-transform duration-300 ease-in-out active:scale-90"
@@ -218,7 +252,6 @@ const ResetPassword = () => {
             )}
           </div>
         </form>
-        <div className="text-semibold mt-2 text-red-500">{formResponse}</div>
       </div>
     </div>
   );

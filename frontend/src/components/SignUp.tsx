@@ -8,6 +8,7 @@ import Navbar from "./Navbar";
 import { useRegisterUserMutation } from "../features/api/authApi";
 import { toast, Toaster } from "sonner";
 import { toastStyles } from "./toastStyles";
+import { registerUserType } from "../types/user";
 
 const SignUp = () => {
   const [formData, setFormData] = useState<SignUpInputState>({
@@ -52,7 +53,7 @@ const SignUp = () => {
       setTypeError("");
     }
     try {
-      const res = await registerUser(formData).unwrap();
+      const res: registerUserType = await registerUser(formData).unwrap();
       toast.success(res.apiMsg, {
         style: toastStyles.success,
       });

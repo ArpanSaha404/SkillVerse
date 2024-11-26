@@ -47,6 +47,8 @@ export type LoginInputState = z.infer<typeof userLoginSchema>;
 //Reset Password
 export const userResetPasswordSchema = z
   .object({
+    email: z.string().email("Invalid Email"),
+    otp: z.string(),
     password: z
       .string()
       .min(6, "Password should have a minimum of 6 characters")

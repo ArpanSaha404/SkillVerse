@@ -1,7 +1,10 @@
-import { string } from "zod";
+export type responseType = {
+  apiMsg: string;
+};
 
 export type registerUserType = {
   apiMsg: string;
+  email: string;
 };
 
 export type loginUserType = {
@@ -18,6 +21,26 @@ export type loginUserType = {
   };
 };
 
-export type logoutUserType = {
+export type sendMailType = {
+  email: string;
+  mailType: string;
+};
+
+export type verifyAccountInputType = {
+  email: string;
+  otp: string;
+};
+
+export type verifyAccountType = {
   apiMsg: string;
+  userDetails: {
+    _id: string;
+    fullName: string;
+    email: string;
+    pic: string;
+    userType: string;
+    isAdmin: boolean;
+    isVerified: boolean;
+    updatedAt: Date;
+  };
 };

@@ -5,7 +5,12 @@ import { console } from "inspector";
 import verifications, { IVerification } from "../models/verifications";
 import { GenerateVerificationOTP } from "../utils/generateVerificationOTP";
 import { GenerateToken } from "../utils/generateToken";
-import { verifyAccountMail, welcomeMail } from "../utils/mailtrap,";
+import {
+  resetPasswordMail,
+  resetPasswordSuccessMail,
+  verifyAccountMail,
+  welcomeMail,
+} from "../utils/mailtrap,";
 
 export const checkAuth = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -55,7 +60,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
       isAdmin: false,
     });
 
-    const verificationOTP = GenerateVerificationOTP(); //make
+    const verificationOTP = GenerateVerificationOTP();
     const newVerification: IVerification = new verifications({
       email: email,
       verificationTypes: "verifyAccount",
@@ -72,6 +77,7 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     res.status(200).json({
       apiMsg: "Sign up Successfull...Please Verify your Account",
+      email,
     });
   } catch (error: any) {
     console.error(error);
@@ -91,19 +97,24 @@ export const login = async (req: Request, res: Response): Promise<void> => {
       res
         .status(400)
         .json({ apiMsg: "User dosen't Exist!!! Please Sign Up First" });
-      return;
     } else {
-      const isPasswordCorrect = await bcrypt.compare(password, user.password);
-      if (!isPasswordCorrect) {
-        res.status(400).json({ apiMsg: "Wrong Password!!!" });
-        return;
+      if (!user.isVerified) {
+        res.status(400).json({
+          apiMsg: "User not Verified...Pls Verify your Account First",
+        });
+      } else {
+        const isPasswordCorrect = await bcrypt.compare(password, user.password);
+        if (!isPasswordCorrect) {
+          res.status(400).json({ apiMsg: "Wrong Password!!!" });
+        } else {
+          GenerateToken(res, user);
+          user.password = "";
+          res.status(200).json({
+            apiMsg: "Logged in Successfully",
+            user,
+          });
+        }
       }
-      GenerateToken(res, user);
-      user.password = "";
-      res.status(200).json({
-        apiMsg: "Logged in Successfully",
-        user,
-      });
     }
   } catch (error: any) {
     console.error(error);
@@ -116,6 +127,83 @@ export const logout = (_: Request, res: Response) => {
     res.clearCookie("token").status(200).json({
       apiMsg: "Logged Out",
     });
+  } catch (error: any) {
+    console.error(error);
+    res.status(400).json({ apiMsg: "Some Error", errorMsg: error.message });
+  }
+};
+
+export const sendMailAgain = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { email, mailType } = req.body;
+  try {
+    const verifyDetails: IVerification | null = await verifications.findOne({
+      email,
+    });
+
+    if (mailType === "verifyAccount") {
+      if (!verifyDetails) {
+        res
+          .status(400)
+          .json({ apiMsg: "User dosen't Exist!!! Please Sign Up First" });
+      } else {
+        if (verifyDetails.verificationTypes === "verifyAccount") {
+          const verificationOTP = GenerateVerificationOTP();
+          verifyDetails.verificationCode = verificationOTP;
+          verifyDetails.verificationExiresAt = new Date(
+            Date.now() + 24 * 60 * 60 * 1000
+          );
+
+          await verifyAccountMail(email, verificationOTP);
+          await verifyDetails.save();
+          res.status(200).json({
+            apiMsg: "OTP Sent again...Your OTP will be valid for 1D!!!",
+          });
+        } else {
+          res
+            .status(400)
+            .json({ apiMsg: "Some Error!!! Pls Contact Our Team" });
+        }
+      }
+    } else if (mailType === "resetPassword") {
+      if (!verifyDetails) {
+        const verificationOTP = GenerateVerificationOTP();
+        const newVerification: IVerification = new verifications({
+          email: email,
+          verificationTypes: "resetPassword",
+          verificationCode: verificationOTP,
+          verificationExiresAt: Date.now() + 24 * 60 * 60 * 1000,
+        });
+
+        await resetPasswordMail(email, verificationOTP);
+        await verifications.create(newVerification);
+
+        res.status(200).json({
+          apiMsg: "OTP Sent to your Mail...",
+          email,
+        });
+      } else {
+        if (verifyDetails.verificationTypes === "resetPassword") {
+          const verificationOTP = GenerateVerificationOTP();
+          verifyDetails.verificationCode = verificationOTP;
+          verifyDetails.verificationExiresAt = new Date(
+            Date.now() + 24 * 60 * 60 * 1000
+          );
+
+          await resetPasswordMail(email, verificationOTP);
+          await verifyDetails.save();
+          res.status(200).json({
+            apiMsg: "OTP Sent again...Your OTP will be valid for 1D!!!",
+          });
+        } else {
+          res
+            .status(400)
+            .json({ apiMsg: "Some Error!!! Pls Contact Our Team" });
+        }
+      }
+    }
   } catch (error: any) {
     console.error(error);
     res.status(400).json({ apiMsg: "Some Error", errorMsg: error.message });
@@ -176,6 +264,71 @@ export const verifyAccount = async (
     res.status(200).json({
       apiMsg: "Verified Successfully",
       userDetails,
+    });
+  } catch (error: any) {
+    console.log(error);
+    res.status(400).json({ apiMsg: "Some Error", errorMsg: error.message });
+  }
+};
+
+export const resetPassword = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { email, otp, password, confirmPassword } = req.body;
+
+  if (password !== confirmPassword) {
+    res.status(400).json({ apiMsg: "Passwords are Different" });
+    return;
+  }
+  try {
+    const resetPassDetails: IVerification | null = await verifications.findOne({
+      email,
+    });
+    const userDetails: Iuser | null = await users
+      .findOne({ email })
+      .select("-password -createdAt -updatedAt -__v");
+
+    if (!userDetails) {
+      res
+        .status(400)
+        .json({ apiMsg: "User not Found...Please Sign up first!!!" });
+    }
+
+    if (!resetPassDetails) {
+      res.status(400).json({ apiMsg: "OTP Expired!!!" });
+    }
+
+    if (!userDetails?.isVerified) {
+      res
+        .status(400)
+        .json({ apiMsg: "User not yet Verified...Pls Verify First!!!" });
+    }
+
+    if (resetPassDetails?.verificationTypes !== "resetPassword") {
+      res.status(400).json({ apiMsg: "Wrong Verifcation..." });
+    }
+
+    if (resetPassDetails) {
+      if (new Date() > resetPassDetails.verificationExiresAt) {
+        res.status(400).json({ apiMsg: "OTP Expired!!!" });
+      }
+
+      if (otp !== resetPassDetails.verificationCode) {
+        res.status(400).json({ apiMsg: "Entered OTP is wrong!!!" });
+      }
+    }
+    await verifications.findOneAndDelete({ email });
+    if (userDetails) {
+      const hashPassword = await bcrypt.hash(password, 10);
+      userDetails.password = hashPassword;
+      await userDetails.save();
+
+      await resetPasswordSuccessMail(email);
+    }
+
+    res.status(200).json({
+      apiMsg: "Password Reset Successfully",
     });
   } catch (error: any) {
     console.log(error);

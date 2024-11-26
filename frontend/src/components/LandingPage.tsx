@@ -20,8 +20,6 @@ const LandingPage = () => {
     }
   };
 
-  console.log(isLoggedIn);
-
   return (
     <div className="h-screen">
       <Navbar />
