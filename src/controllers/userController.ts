@@ -15,7 +15,9 @@ import {
 export const checkAuth = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.userId;
-    const user: Iuser | null = await users.findById(userId).select("-password");
+    const user: Iuser | null = await users
+      .findById(userId)
+      .select("-password -createdAt -updatedAt -__v");
     if (!user) {
       res.status(200).json({
         apiMsg: "User not Found",
@@ -70,10 +72,8 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 
     await verifyAccountMail(email, verificationOTP);
 
-    const insertedData = await users.create(newUser);
+    await users.create(newUser);
     await verifications.create(newVerification);
-
-    GenerateToken(res, insertedData);
 
     res.status(200).json({
       apiMsg: "Sign up Successfull...Please Verify your Account",
@@ -259,6 +259,8 @@ export const verifyAccount = async (
       await userDetails.save();
 
       await welcomeMail(email, userDetails.fullName);
+
+      GenerateToken(res, userDetails);
     }
 
     res.status(200).json({

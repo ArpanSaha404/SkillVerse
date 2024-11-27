@@ -52,6 +52,20 @@ const Login = () => {
       toast.error(error.data.apiMsg, {
         style: toastStyles.error,
       });
+      if (
+        error.data.apiMsg ===
+        "User not Verified...Pls Verify your Account First"
+      ) {
+        setTimeout(() => {
+          navigate("/verify-account");
+        }, 1000);
+      }
+
+      if (error.data.apiMsg === "User dosen't Exist!!! Please Sign Up First") {
+        setTimeout(() => {
+          navigate("/signup");
+        }, 1000);
+      }
     }
   };
 

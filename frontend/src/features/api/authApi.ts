@@ -22,6 +22,28 @@ export const authApi = createApi({
     // credentials: "include",
   }),
   endpoints: (builder) => ({
+    checkAuth: builder.query<loginUserType, void>({
+      query: () => "/check-auth",
+      async onQueryStarted(_, { queryFulfilled, dispatch }) {
+        try {
+          const result = await queryFulfilled;
+          if (result.data.user) {
+            dispatch(
+              login({
+                email: result.data.user.email,
+                fullName: result.data.user.fullName,
+                pic: result.data.user.pic,
+                userType: result.data.user.userType,
+                isAdmin: result.data.user.isAdmin,
+                isVerified: result.data.user.isVerified,
+              })
+            );
+          }
+        } catch (error: any) {
+          console.log(error);
+        }
+      },
+    }),
     registerUser: builder.mutation<registerUserType, SignUpInputState>({
       query: (inputData) => ({
         url: "/register",
@@ -37,7 +59,7 @@ export const authApi = createApi({
             })
           );
         } catch (error: any) {
-          console.log(error.data.apiMsg);
+          console.log(error);
         }
       },
     }),
@@ -50,18 +72,20 @@ export const authApi = createApi({
       async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
-          dispatch(
-            login({
-              email: result.data.user.email,
-              fullName: result.data.user.fullName,
-              pic: result.data.user.pic,
-              userType: result.data.user.userType,
-              isAdmin: result.data.user.isAdmin,
-              isVerified: result.data.user.isVerified,
-            })
-          );
+          if (result.data.user) {
+            dispatch(
+              login({
+                email: result.data.user.email,
+                fullName: result.data.user.fullName,
+                pic: result.data.user.pic,
+                userType: result.data.user.userType,
+                isAdmin: result.data.user.isAdmin,
+                isVerified: result.data.user.isVerified,
+              })
+            );
+          }
         } catch (error: any) {
-          console.log(error.data.apiMsg);
+          console.log(error);
         }
       },
     }),
@@ -72,7 +96,7 @@ export const authApi = createApi({
           await queryFulfilled;
           dispatch(logout());
         } catch (error: any) {
-          console.log(error.data.apiMsg);
+          console.log(error);
         }
       },
     }),
@@ -103,7 +127,7 @@ export const authApi = createApi({
             })
           );
         } catch (error: any) {
-          console.error(error.data.apiMsg);
+          console.log(error);
         }
       },
     }),
@@ -118,6 +142,7 @@ export const authApi = createApi({
 });
 
 export const {
+  useLazyCheckAuthQuery,
   useRegisterUserMutation,
   useLoginUserMutation,
   useLazyLogOutUserQuery,

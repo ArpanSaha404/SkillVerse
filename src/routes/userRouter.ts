@@ -1,4 +1,4 @@
-import express, { Request, Response } from "express";
+import express from "express";
 import {
   checkAuth,
   login,
@@ -8,10 +8,11 @@ import {
   sendMailAgain,
   verifyAccount,
 } from "../controllers/userController";
+import { isAuthenticated } from "../middlewares/isAuthenticated";
 
 const router = express.Router();
 
-router.post("/check-auth", checkAuth);
+router.get("/check-auth", isAuthenticated, checkAuth);
 router.post("/register", register);
 router.post("/login", login);
 router.get("/logout", logout);

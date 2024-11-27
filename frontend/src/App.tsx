@@ -8,23 +8,34 @@ import CoursesPage from "./components/CoursesPage";
 import CourseDetails from "./components/CourseDetails";
 import CourseProgress from "./components/CourseProgress";
 import Loading from "./components/Loading";
+import ProtectedRoutes from "./components/ProtectedRoutes";
 
 function App() {
   return (
     <div className="App">
       <Router>
+        {/* <ProtectedRoutes> */}
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/login" element={<Login />} />
           <Route path="/verify-account" element={<Verifyaccount />} />
           <Route path="/reset-password" element={<ResetPassword />} />
-          <Route path="/courses" element={<CoursesPage />} />
+          <Route
+            path="/courses"
+            element={
+              <ProtectedRoutes>
+                <CoursesPage />
+              </ProtectedRoutes>
+            }
+          />
+          <Route path="/courses/:searchText" element={<CoursesPage />} />
           <Route path="/course-details" element={<CourseDetails />} />
           <Route path="/course-progress" element={<CourseProgress />} />
           <Route path="/loading" element={<Loading />} />
           <Route path="*" element={<LandingPage />} />
         </Routes>
+        {/* </ProtectedRoutes> */}
       </Router>
     </div>
   );

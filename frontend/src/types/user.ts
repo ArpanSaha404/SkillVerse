@@ -9,7 +9,7 @@ export type registerUserType = {
 
 export type loginUserType = {
   apiMsg: string;
-  user: {
+  user?: {
     _id: string;
     fullName: string;
     email: string;
@@ -19,6 +19,7 @@ export type loginUserType = {
     isAdmin: boolean;
     isVerified: boolean;
   };
+  error?: any;
 };
 
 export type sendMailType = {

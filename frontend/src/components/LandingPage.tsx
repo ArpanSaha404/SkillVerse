@@ -1,28 +1,60 @@
 import { Button } from "./ui/button";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Loader2, MoveRight } from "lucide-react";
 import Navbar from "./Navbar";
 import { useAppSelector } from "../app/hooks";
+import { useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
+import { useLazyCheckAuthQuery } from "../features/api/authApi";
+import { toast, Toaster } from "sonner";
+import { toastStyles } from "./toastStyles";
 
 const LandingPage = () => {
   const [SearchText, setSearchText] = useState<string>("");
-  const isLoading = true;
+
+  const [checkAuth, { isLoading }] = useLazyCheckAuthQuery();
+
+  const navigate = useNavigate();
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
   const changeInputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setSearchText(e.target.value);
   };
 
+  useEffect(() => {
+    const fetchUserData = async () => {
+      const token = Cookies.get("token");
+      if (token) {
+        try {
+          const res = await checkAuth().unwrap();
+          toast.success(res.apiMsg, {
+            style: toastStyles.success,
+          });
+          setTimeout(() => {
+            navigate("/");
+          }, 1000);
+        } catch (error: any) {
+          toast.error(error.data.apiMsg, {
+            style: toastStyles.error,
+          });
+        }
+      }
+    };
+    fetchUserData();
+  });
+
   const handleSearchClick = () => {
     if (!isLoggedIn) {
-      alert("Please Login or Signup First to See all Courses");
-      return;
+      navigate("/login");
+    } else {
+      navigate(`/courses/${SearchText}`);
     }
   };
 
   return (
     <div className="h-screen">
       <Navbar />
+      <Toaster />
       <div className="md:divCenter">
         <div className="ml-8 mr-4 w-6/12 font-sans font-bold flex justify-center items-center">
           <div className="space-y-8">
@@ -63,7 +95,10 @@ const LandingPage = () => {
               <div className="hidden">We have 30k+ Courses...</div>
             </div>
             <div className="text-center flex items-center justify-around">
-              <Button className="h-10 w-auto divCenter bg-brwn text-white rounded-md hover:bg-hvrBrwn transition-transform duration-300 ease-in-out active:scale-90">
+              <Button
+                onClick={() => navigate("/courses")}
+                className="h-10 w-auto divCenter bg-brwn text-white rounded-md hover:bg-hvrBrwn transition-transform duration-300 ease-in-out active:scale-90"
+              >
                 Explore All Courses <MoveRight className="pl-2" />
               </Button>
             </div>
