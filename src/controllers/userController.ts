@@ -11,6 +11,12 @@ import {
   verifyAccountMail,
   welcomeMail,
 } from "../utils/mailtrap,";
+import {
+  deleteImageFromCloudinary,
+  uploadMediaToCloudinary,
+} from "../utils/cloudinary";
+import { UploadApiErrorResponse, UploadApiResponse } from "cloudinary";
+import { deleteTempFile } from "../utils/multer";
 
 export const checkAuth = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -332,6 +338,25 @@ export const resetPassword = async (
     res.status(200).json({
       apiMsg: "Password Reset Successfully",
     });
+  } catch (error: any) {
+    console.log(error);
+    res.status(400).json({ apiMsg: "Some Error", errorMsg: error.message });
+  }
+};
+
+export const updateImage = async (req: Request, res: Response) => {
+  const file = req.file as Express.Multer.File;
+
+  try {
+    if (file && file.path) {
+      // Cloudinary Actions
+      const url: UploadApiResponse | undefined = await uploadMediaToCloudinary(
+        file.path
+      );
+      await deleteImageFromCloudinary("b7vz91ervfayinmad1ui");
+      deleteTempFile(file.path);
+      res.status(200).json({ apiMsg: "Hello" });
+    }
   } catch (error: any) {
     console.log(error);
     res.status(400).json({ apiMsg: "Some Error", errorMsg: error.message });

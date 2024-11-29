@@ -11,7 +11,6 @@ import {
   responseType,
   sendMailType,
   verifyAccountInputType,
-  verifyAccountType,
 } from "../../types/user";
 import { signup, login, logout } from "../authSlice";
 
@@ -19,7 +18,7 @@ export const authApi = createApi({
   reducerPath: "authApi",
   baseQuery: fetchBaseQuery({
     baseUrl: `${frontend_URL}/api/users`,
-    // credentials: "include",
+    credentials: "include",
   }),
   endpoints: (builder) => ({
     checkAuth: builder.query<loginUserType, void>({
@@ -28,14 +27,18 @@ export const authApi = createApi({
         try {
           const result = await queryFulfilled;
           if (result.data.user) {
+            const userData = result.data.user;
             dispatch(
               login({
-                email: result.data.user.email,
-                fullName: result.data.user.fullName,
-                pic: result.data.user.pic,
-                userType: result.data.user.userType,
-                isAdmin: result.data.user.isAdmin,
-                isVerified: result.data.user.isVerified,
+                _id: userData._id,
+                email: userData.email,
+                fullName: userData.fullName,
+                pic: userData.pic,
+                userType: userData.userType,
+                isVerified: userData.isVerified,
+                isAdmin: userData.isAdmin,
+                coursesBought: userData.coursesBought,
+                coursesCreated: userData.coursesCreated,
               })
             );
           }
@@ -73,14 +76,18 @@ export const authApi = createApi({
         try {
           const result = await queryFulfilled;
           if (result.data.user) {
+            const userData = result.data.user;
             dispatch(
               login({
-                email: result.data.user.email,
-                fullName: result.data.user.fullName,
-                pic: result.data.user.pic,
-                userType: result.data.user.userType,
-                isAdmin: result.data.user.isAdmin,
-                isVerified: result.data.user.isVerified,
+                _id: userData._id,
+                email: userData.email,
+                fullName: userData.fullName,
+                pic: userData.pic,
+                userType: userData.userType,
+                isVerified: userData.isVerified,
+                isAdmin: userData.isAdmin,
+                coursesBought: userData.coursesBought,
+                coursesCreated: userData.coursesCreated,
               })
             );
           }
@@ -107,7 +114,7 @@ export const authApi = createApi({
         body: inputData,
       }),
     }),
-    verifyAccount: builder.mutation<verifyAccountType, verifyAccountInputType>({
+    verifyAccount: builder.mutation<loginUserType, verifyAccountInputType>({
       query: (inputData) => ({
         url: "/verify-account",
         method: "PATCH",
@@ -116,16 +123,22 @@ export const authApi = createApi({
       async onQueryStarted(_, { queryFulfilled, dispatch }) {
         try {
           const result = await queryFulfilled;
-          dispatch(
-            login({
-              email: result.data.userDetails.email,
-              fullName: result.data.userDetails.fullName,
-              pic: result.data.userDetails.pic,
-              userType: result.data.userDetails.userType,
-              isAdmin: result.data.userDetails.isAdmin,
-              isVerified: result.data.userDetails.isVerified,
-            })
-          );
+          if (result.data.user) {
+            const userData = result.data.user;
+            dispatch(
+              login({
+                _id: userData._id,
+                email: userData.email,
+                fullName: userData.fullName,
+                pic: userData.pic,
+                userType: userData.userType,
+                isVerified: userData.isVerified,
+                isAdmin: userData.isAdmin,
+                coursesBought: userData.coursesBought,
+                coursesCreated: userData.coursesCreated,
+              })
+            );
+          }
         } catch (error: any) {
           console.log(error);
         }

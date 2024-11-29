@@ -4,9 +4,12 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import userRouter from "./routes/userRouter";
-import categoryRoutes from "./routes/CategoriesRoutes";
 import courseRoutes from "./routes/courseRoutes";
+import courseProgressRoutes from "./routes/courseProgressRoutes";
+import CategoriesRoutes from "./routes/CategoriesRoutes";
+import paymentRoutes from "./routes/paymentRoutes";
 import path from "path";
+import fs from "fs";
 
 dotenv.config();
 
@@ -16,17 +19,28 @@ const PORT = process.env.PORT || 8000;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-app.use(cors());
+app.use(
+  cors({
+    origin: process.env.frontend_URL,
+    credentials: true,
+  })
+);
 
-const _dirName = path.resolve();
+export const _dirName = path.resolve();
+const uploadDir = path.join(__dirname, "uploads");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
 
 app.use("/api/users", userRouter);
-app.use("/api/category", categoryRoutes);
 app.use("/api/course", courseRoutes);
+app.use("/api/category", CategoriesRoutes);
+app.use("/api/course-progress", courseProgressRoutes);
+app.use("/api/payments", paymentRoutes);
 
 // Delete Later
 app.get("/test", (_, res: Response) => {
-  console.log("Hello");
   res.send("Server Started!!! This is a Test Link...");
 });
 

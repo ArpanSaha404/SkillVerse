@@ -25,6 +25,7 @@ import { useLazyLogOutUserQuery } from "../features/api/authApi";
 import { toast, Toaster } from "sonner";
 import { toastStyles } from "./toastStyles";
 import { useAppSelector } from "../app/hooks";
+import { responseType } from "../types/user";
 
 const Navbar = () => {
   const [isDark, setIsDark] = useState<boolean>(false);
@@ -40,12 +41,12 @@ const Navbar = () => {
   const isTeacher =
     useAppSelector((state) => state.auth.userType) === "Teacher" ? true : false;
 
-  const boughtCourses = 5;
-  const createdCourses = 5;
+  const boughtCourses = useAppSelector((state) => state.auth.coursesBought);
+  const createdCourses = useAppSelector((state) => state.auth.coursesCreated);
 
   const handleLogout = async () => {
     try {
-      const res = await logOutUser().unwrap();
+      const res: responseType = await logOutUser().unwrap();
       toast.success(res.apiMsg, {
         style: toastStyles.success,
       });
@@ -105,13 +106,21 @@ const Navbar = () => {
                     <Link to="/">Update Profile</Link>
                   </MenubarItem>
                   <MenubarItem className="text-hvrBrwn text-md hover:underline hover:hdrBrwn">
-                    <Link to="/">My Courses {"(" + boughtCourses + ")"}</Link>
+                    <Link to="/">
+                      My Courses{" "}
+                      {boughtCourses.length > 0
+                        ? "(" + boughtCourses.length + ")"
+                        : ""}
+                    </Link>
                   </MenubarItem>
                   {isTeacher ? <MenubarSeparator /> : <></>}
                   {isTeacher ? (
                     <MenubarItem className="text-hvrBrwn text-md hover:underline hover:hdrBrwn">
                       <Link to="/">
-                        Created Courses {"(" + createdCourses + ")"}
+                        Created Courses{" "}
+                        {createdCourses.length > 0
+                          ? "(" + createdCourses.length + ")"
+                          : ""}
                       </Link>
                     </MenubarItem>
                   ) : (
@@ -196,8 +205,8 @@ const MobileNavbar = () => {
   const isTeacher =
     useAppSelector((state) => state.auth.userType) === "Teacher" ? true : false;
 
-  const boughtCourses = 5;
-  const createdCourses = 5;
+  const boughtCourses = useAppSelector((state) => state.auth.coursesBought);
+  const createdCourses = useAppSelector((state) => state.auth.coursesCreated);
 
   const handleLogout = async () => {
     try {
@@ -273,13 +282,19 @@ const MobileNavbar = () => {
                     Explore All Courses
                   </Link>
                   <Link to="/" className="w-full hover:underline">
-                    My Courses {"(" + boughtCourses + ")"}
+                    My Courses{" "}
+                    {boughtCourses.length > 0
+                      ? "(" + boughtCourses.length + ")"
+                      : ""}
                   </Link>
                   {isTeacher ? (
                     <>
                       <Separator />
                       <Link to="/" className="w-full hover:underline">
-                        Created Courses {"(" + createdCourses + ")"}
+                        Created Courses{" "}
+                        {createdCourses.length > 0
+                          ? "(" + createdCourses.length + ")"
+                          : ""}
                       </Link>
                       <Link to="/" className="w-full hover:underline">
                         My Dasboard

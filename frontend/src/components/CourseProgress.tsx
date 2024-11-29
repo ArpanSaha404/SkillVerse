@@ -9,7 +9,7 @@ import { Separator } from "./ui/separator";
 
 const CourseProgress = () => {
   const [singleCourseData] = useFetch(
-    `http://localhost:5000/api/course/singlecourse/673ca1df7844b716f74706dc`
+    `http://localhost:5000/api/course/course-details/67484ed9ae0d48d8ad529b5c`
   );
 
   if (!singleCourseData) {
@@ -28,6 +28,9 @@ const CourseProgress = () => {
   const isBought: boolean = true;
   const isCourseCompleted = true;
   const chapterList: chapterType[] = singleCourseData.courseData.chapters;
+
+  console.log(chapterList);
+
   return (
     <div>
       <Navbar />

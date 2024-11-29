@@ -11,10 +11,10 @@ import {
 import { toast, Toaster } from "sonner";
 import { toastStyles } from "./toastStyles";
 import {
+  loginUserType,
   responseType,
   sendMailType,
   verifyAccountInputType,
-  verifyAccountType,
 } from "../types/user";
 import { useNavigate } from "react-router-dom";
 
@@ -82,7 +82,7 @@ const Verifyaccount = () => {
     const inputData: verifyAccountInputType = { email, otp };
 
     try {
-      const res: verifyAccountType = await verifyAccount(inputData).unwrap();
+      const res: loginUserType = await verifyAccount(inputData).unwrap();
       toast.success(res.apiMsg, {
         style: toastStyles.success,
       });

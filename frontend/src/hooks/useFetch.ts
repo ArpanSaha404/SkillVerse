@@ -7,7 +7,7 @@ const useFetch = (url: string) => {
   useEffect(() => {
     const fetchData = async () => {
       await axios
-        .get(url)
+        .get(url, { withCredentials: true })
         .then((res) => setData(res.data))
         .catch((err) => console.error(err));
     };

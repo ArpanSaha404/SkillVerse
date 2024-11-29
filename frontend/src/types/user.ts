@@ -13,11 +13,14 @@ export type loginUserType = {
     _id: string;
     fullName: string;
     email: string;
-    password: string;
+    password?: string;
     pic: string;
     userType: string;
-    isAdmin: boolean;
     isVerified: boolean;
+    isAdmin: boolean;
+    coursesBought: string[];
+    coursesCreated: string[];
+    updatedAt?: Date;
   };
   error?: any;
 };
@@ -32,16 +35,18 @@ export type verifyAccountInputType = {
   otp: string;
 };
 
-export type verifyAccountType = {
-  apiMsg: string;
-  userDetails: {
-    _id: string;
-    fullName: string;
-    email: string;
-    pic: string;
-    userType: string;
-    isAdmin: boolean;
-    isVerified: boolean;
-    updatedAt: Date;
-  };
-};
+// export type verifyAccountType = {
+//   apiMsg: string;
+//   userDetails: {
+//     _id: string;
+//     fullName: string;
+//     email: string;
+//     pic: string;
+//     userType: string;
+//     isVerified: boolean;
+//     isAdmin: boolean;
+//     coursesBought: string[];
+//     coursesCreated: string[];
+//     updatedAt: Date;
+//   };
+// };

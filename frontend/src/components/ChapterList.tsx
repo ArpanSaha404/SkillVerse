@@ -36,6 +36,10 @@ const ChapterList: React.FC<chaptersListProps> = ({
     setIsIdx(idx);
   };
 
+  console.log(chapters);
+  console.log(isBought);
+  console.log(freeChapterIdx);
+
   return (
     <div>
       <div className="flex items-start justify-between m-4">
@@ -48,7 +52,7 @@ const ChapterList: React.FC<chaptersListProps> = ({
         </div>
         <div className="hidden md:divCenter flex-col space-y-8 w-full">
           <h1 className="text-xl font-semibold">Chapter List :</h1>
-          {chapters && freeChapterIdx && isBought ? (
+          {chapters && isBought ? (
             <div className="flex w-full items-start justify-start space-y-4 flex-col">
               {chapters.map((data: chapterType, idx: number) => (
                 <div
@@ -93,7 +97,10 @@ const ChapterList: React.FC<chaptersListProps> = ({
               ))}
             </div>
           ) : (
-            <Loading skeletonType="chapterList" />
+            <>
+              Hello
+              <Loading skeletonType="chapterList" />
+            </>
           )}
         </div>
       </div>

@@ -1,9 +1,8 @@
-import { Date } from "mongoose";
-
 export type chapterType = {
   chapterTitle: string;
-  chapterDesc?: string;
-  chapterVid: string;
+  chapterDesc: string;
+  chapterVidURL: string;
+  chapterPublicId: string;
   isChapterPublished: boolean;
 };
 
@@ -13,13 +12,21 @@ export type courseType = {
   createdBy: string;
   subTitle: string;
   desc: string;
-  coursePic?: string;
+  coursePic: string;
   categories: string;
   price: number;
   freeChapterIdx: number;
-  chapters?: chapterType[];
+  chapters: chapterType[];
   isPublished: boolean;
-  boughtby?: string[];
-  createdAt?: Date;
-  updatedAt?: Date;
+  boughtby: string[];
+};
+
+export type allCoursesType = {
+  apiMsg: string;
+  courseData: courseType[];
+};
+
+export type singleCoursesType = {
+  apiMsg: string;
+  courseData: courseType;
 };

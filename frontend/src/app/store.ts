@@ -1,8 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
 import rootReducer from "./rootReducer";
-import { authApi } from "../features/api/authApi";
 import storage from "redux-persist/lib/storage";
 import { persistReducer } from "redux-persist";
+import { authApi } from "../features/api/authApi";
+import { courseApi } from "../features/api/courseApi";
 
 const persistConfig = {
   key: "root",
@@ -15,7 +16,7 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 export const store = configureStore({
   reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(authApi.middleware),
+    getDefaultMiddleware().concat(authApi.middleware, courseApi.middleware),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

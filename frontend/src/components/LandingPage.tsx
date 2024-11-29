@@ -8,6 +8,7 @@ import Cookies from "js-cookie";
 import { useLazyCheckAuthQuery } from "../features/api/authApi";
 import { toast, Toaster } from "sonner";
 import { toastStyles } from "./toastStyles";
+import { loginUserType } from "../types/user";
 
 const LandingPage = () => {
   const [SearchText, setSearchText] = useState<string>("");
@@ -16,23 +17,16 @@ const LandingPage = () => {
 
   const navigate = useNavigate();
   const isLoggedIn = useAppSelector((state) => state.auth.isLoggedIn);
-  const changeInputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
-    e.preventDefault();
-    setSearchText(e.target.value);
-  };
 
   useEffect(() => {
     const fetchUserData = async () => {
       const token = Cookies.get("token");
       if (token) {
         try {
-          const res = await checkAuth().unwrap();
+          const res: loginUserType = await checkAuth().unwrap();
           toast.success(res.apiMsg, {
             style: toastStyles.success,
           });
-          setTimeout(() => {
-            navigate("/");
-          }, 1000);
         } catch (error: any) {
           toast.error(error.data.apiMsg, {
             style: toastStyles.error,
@@ -42,6 +36,11 @@ const LandingPage = () => {
     };
     fetchUserData();
   });
+
+  const changeInputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setSearchText(e.target.value);
+  };
 
   const handleSearchClick = () => {
     if (!isLoggedIn) {
@@ -76,7 +75,7 @@ const LandingPage = () => {
                   }
                 }}
               />
-              {isLoading ? (
+              {!isLoading ? (
                 <Button
                   className="h-10 w-12 divCenter bg-brwn text-white rounded-md hover:bg-hvrBrwn transition-transform duration-300 ease-in-out active:scale-90"
                   onClick={handleSearchClick}

@@ -8,8 +8,8 @@ import { isAuthenticated } from "../middlewares/isAuthenticated";
 
 const router = express.Router();
 
-router.post("/course", addCourse);
-router.get("/course", viewAllCourses);
-router.get("/singlecourse/:id", isAuthenticated, viewSingleCourse);
+router.post("/course", isAuthenticated, addCourse);
+router.get("/course", isAuthenticated, viewAllCourses);
+router.get("/course-details/:id", isAuthenticated, viewSingleCourse);
 
 export default router;

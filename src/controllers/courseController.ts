@@ -22,9 +22,13 @@ export const viewAllCourses = async (
 ): Promise<void> => {
   try {
     console.log("hello");
-    const courseData: ICourses[] | null = await Course.find().sort({
-      price: 1,
-    });
+    const courseData: ICourses[] | null = await Course.find({
+      isPublished: true,
+    })
+      .select("-createdAt -updatedAt -__v")
+      .sort({
+        price: 1,
+      });
     res.status(200).json({
       apiMsg: "Course Fetched Successfully",
       courseData,
@@ -42,11 +46,14 @@ export const viewSingleCourse = async (
   try {
     const id = req.params.id;
     const courseData: ICourses | null = await Course.findById(id);
-    console.log("Hello");
-    res.status(200).json({
-      apiMsg: "Course Fetched Successfully",
-      courseData,
-    });
+    if (!courseData) {
+      res.status(400).json({ apiMsg: "No Relevant Course Data" });
+    } else {
+      res.status(200).json({
+        apiMsg: "Course Fetched Successfully",
+        courseData,
+      });
+    }
   } catch (error: any) {
     console.error(error);
     res.status(400).json({ apiMsg: "Some Error", errorMsg: error.message });

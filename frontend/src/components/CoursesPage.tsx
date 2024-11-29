@@ -1,20 +1,76 @@
-import { BookOpen } from "lucide-react";
+import { BookOpen, IndianRupee, Loader2, MoveRight } from "lucide-react";
 import FilterCategories from "./FilterCategories";
-import useFetch from "../hooks/useFetch";
-import { frontend_URL } from "./lib/utils";
 import Loading from "./Loading";
 import Navbar from "./Navbar";
 import { courseType } from "../types/courses";
+import { Button } from "./ui/button";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { useAllCourseDataQuery } from "../features/api/courseApi";
+import { useAppSelector } from "../app/hooks";
 
 const CoursesPage = () => {
-  const [courseData] = useFetch(`${frontend_URL}/api/course/course`);
-  const bought = true;
+  const { searchQuery } = useParams<{ searchQuery?: string }>();
+  const text = searchQuery || "";
+  const [SearchText, setSearchText] = useState<string>(text);
+
+  const { data, isLoading } = useAllCourseDataQuery();
+  const [courseData, setCourseData] = useState<courseType[]>([]);
+
+  const navigate = useNavigate();
+  const boughtCourses = useAppSelector((state) => state.auth.coursesBought);
+  const createdCourses = useAppSelector((state) => state.auth.coursesCreated);
+
+  useEffect(() => {
+    if (data && data.courseData) {
+      setCourseData(data.courseData);
+    }
+  }, [data, courseData]);
+
+  const changeInputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.preventDefault();
+    setSearchText(e.target.value);
+  };
+
+  const handleSearchClick = () => {};
 
   return (
     <div>
-      <div className="divcenter">
+      <div className="">
         <Navbar />
-        <div className="md:flex md:items-start md:justify-start mt-8">
+        <div className="md:w-full w-auto divCenter my-4">
+          <div className="gap-4 md:w-1/2 w-full flex divCenter">
+            <input
+              className="border-hvrBrwn border-2 border-solid rounded-md px-4 h-10 w-3/4"
+              name="serachText"
+              type="text"
+              placeholder="Search for a Course"
+              value={SearchText}
+              onChange={changeInputHandler}
+              onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+                if (e.key === "Enter") {
+                  handleSearchClick();
+                }
+              }}
+            />
+            {!isLoading ? (
+              <Button
+                className="h-10 w-12 divCenter bg-brwn text-white rounded-md hover:bg-hvrBrwn transition-transform duration-300 ease-in-out active:scale-90"
+                onClick={handleSearchClick}
+              >
+                <MoveRight />
+              </Button>
+            ) : (
+              <Button
+                disabled
+                className="h-10 w-12 divCenter bg-hdrBrwn text-white rounded-md"
+              >
+                <Loader2 className="animate-spin" />
+              </Button>
+            )}
+          </div>
+        </div>
+        <div className="md:flex md:items-start md:justify-start">
           <div className="md:hidden lg:hidden">
             <FilterCategories />
           </div>
@@ -25,7 +81,7 @@ const CoursesPage = () => {
           </div>
           {courseData ? (
             <div className="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8 md:mt-2 mx-8">
-              {courseData.courseData.map((data: courseType, idx: number) => (
+              {courseData.map((data: courseType, idx: number) => (
                 <div
                   key={idx}
                   className="shadow-lg w-full p-4 rounded-lg bg-slate-200"
@@ -53,14 +109,42 @@ const CoursesPage = () => {
                           <BookOpen className="mr-2" />
                           {data.chapters?.length || 0} Chapters
                         </div>
-                        {!bought ? <div>{data.price}</div> : <></>}
                       </div>
                     </div>
                   </div>
-                  <div className="w-full flex items-center justify-between">
-                    <div>{"Progress bar"}</div>
-                    <div>{"Percentage"}</div>
-                  </div>
+                  {boughtCourses.includes(courseData[idx]._id) ? (
+                    <div className="w-full flex items-center justify-between">
+                      <div>{"Progress bar"}</div>
+                      <div>{"Percentage"}</div>
+                    </div>
+                  ) : createdCourses.includes(courseData[idx]._id) ? (
+                    <div className="w-full text-lg font-semibold flex items-center justify-between">
+                      <div className="divCenter">Course Created by You</div>
+                      <Button
+                        onClick={() =>
+                          navigate(`/course-details/${courseData[idx]._id}`)
+                        }
+                        className="text-white bg-hvrBrwn rounded-md hover:bg-hdrBrwn transition-transform duration-300 ease-in-out active:scale-90"
+                      >
+                        Explore Course
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="w-full text-lg font-semibold flex items-center justify-between">
+                      <div className="divCenter">
+                        <IndianRupee size={18} />
+                        {data.price}
+                      </div>
+                      <Button
+                        onClick={() =>
+                          navigate(`/course-details/${courseData[idx]._id}`)
+                        }
+                        className="text-white bg-hvrBrwn rounded-md hover:bg-hdrBrwn transition-transform duration-300 ease-in-out active:scale-90"
+                      >
+                        Explore Course
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

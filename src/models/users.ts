@@ -3,12 +3,13 @@ import mongoose, { Document } from "mongoose";
 export interface Iuser extends Document {
   fullName: string;
   email: string;
-  pic?: string;
+  pic: string;
   password: string;
   userType: string;
   isVerified: boolean;
   isAdmin: boolean;
-  coursesBought?: mongoose.Schema.Types.ObjectId[];
+  coursesBought: mongoose.Schema.Types.ObjectId[];
+  coursesCreated: mongoose.Schema.Types.ObjectId[];
 }
 
 export enum userTypes {
@@ -52,6 +53,20 @@ const UserSchema = new mongoose.Schema<Iuser>(
       type: Boolean,
       default: false,
     },
+    coursesBought: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Course",
+        default: [],
+      },
+    ],
+    coursesCreated: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Course",
+        default: [],
+      },
+    ],
   },
   {
     timestamps: true,

@@ -9,6 +9,7 @@ import CourseDetails from "./components/CourseDetails";
 import CourseProgress from "./components/CourseProgress";
 import Loading from "./components/Loading";
 import ProtectedRoutes from "./components/ProtectedRoutes";
+import UpdateProfile from "./components/UpdateProfile";
 
 function App() {
   return (
@@ -29,9 +30,11 @@ function App() {
               </ProtectedRoutes>
             }
           />
-          <Route path="/courses/:searchText" element={<CoursesPage />} />
-          <Route path="/course-details" element={<CourseDetails />} />
+          <Route path="/courses/:searchQuery" element={<CoursesPage />} />
+          <Route path="/course-details/:id" element={<CourseDetails />} />
           <Route path="/course-progress" element={<CourseProgress />} />
+
+          <Route path="/upload" element={<UpdateProfile />} />
           <Route path="/loading" element={<Loading />} />
           <Route path="*" element={<LandingPage />} />
         </Routes>

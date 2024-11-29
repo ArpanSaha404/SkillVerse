@@ -5,11 +5,14 @@ interface authNotVerifiedState {
 }
 
 interface authInputState extends authNotVerifiedState {
+  _id: string;
   fullName: string;
   pic: string;
   userType: string;
-  isAdmin: boolean;
   isVerified: boolean;
+  isAdmin: boolean;
+  coursesBought: string[];
+  coursesCreated: string[];
 }
 
 interface authState extends authInputState {
@@ -17,12 +20,15 @@ interface authState extends authInputState {
 }
 
 const initialState: authState = {
+  _id: "",
   fullName: "",
   email: "",
   pic: "",
   userType: "Student",
-  isAdmin: false,
   isVerified: false,
+  isAdmin: false,
+  coursesBought: [],
+  coursesCreated: [],
   isLoggedIn: false,
 };
 
@@ -35,12 +41,15 @@ export const authSlice = createSlice({
       state.isLoggedIn = false;
     },
     login: (state, action: PayloadAction<authInputState>) => {
+      state._id = action.payload._id;
       state.email = action.payload.email;
       state.fullName = action.payload.fullName;
       state.pic = action.payload.pic;
       state.userType = action.payload.userType;
-      state.isAdmin = action.payload.isAdmin;
       state.isVerified = action.payload.isVerified;
+      state.isAdmin = action.payload.isAdmin;
+      state.coursesBought = action.payload.coursesBought;
+      state.coursesCreated = action.payload.coursesCreated;
       state.isLoggedIn = true;
     },
     logout: (state) => {

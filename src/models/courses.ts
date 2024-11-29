@@ -2,23 +2,25 @@ import mongoose, { Document } from "mongoose";
 
 export type chapterType = {
   chapterTitle: string;
-  chapterDesc?: string;
-  chapterVid: string;
+  chapterDesc: string;
+  chapterVidURL: string;
+  chapterPublicId: string;
   isChapterPublished: boolean;
 };
 
 export interface ICourses extends Document {
   name: string;
   createdBy: string;
+  creatorId: mongoose.Schema.Types.ObjectId;
   subTitle: string;
   desc: string;
-  coursePic?: string;
+  coursePic: string;
   categories: string;
   price: number;
   freeChapterIdx: number;
-  chapters?: chapterType[];
+  chapters: chapterType[];
   isPublished: boolean;
-  boughtby?: mongoose.Schema.Types.ObjectId[];
+  boughtby: mongoose.Schema.Types.ObjectId[];
 }
 
 const Courses = new mongoose.Schema<ICourses>(
@@ -30,6 +32,11 @@ const Courses = new mongoose.Schema<ICourses>(
     },
     createdBy: {
       type: String,
+      required: true,
+      ref: "User",
+    },
+    creatorId: {
+      type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "User",
     },
@@ -69,7 +76,11 @@ const Courses = new mongoose.Schema<ICourses>(
           type: String,
           default: "",
         },
-        chapterVid: {
+        chapterVidURL: {
+          type: String,
+          required: true,
+        },
+        chapterPublicId: {
           type: String,
           required: true,
         },
@@ -77,6 +88,7 @@ const Courses = new mongoose.Schema<ICourses>(
           type: Boolean,
           default: true,
         },
+        default: [],
       },
     ],
     isPublished: {
@@ -87,6 +99,8 @@ const Courses = new mongoose.Schema<ICourses>(
     boughtby: [
       {
         type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        default: [],
       },
     ],
   },
