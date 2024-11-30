@@ -1,6 +1,10 @@
-import { allCoursesType, singleCoursesType } from "../../types/courses";
-import { frontend_URL } from "../../components/lib/utils";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import {
+  allCoursesType,
+  creatorPic,
+  singleCoursesType,
+} from "../../types/courses";
+import { frontend_URL } from "../../components/lib/utils";
 
 export const courseApi = createApi({
   reducerPath: "courseApi",
@@ -15,8 +19,14 @@ export const courseApi = createApi({
     getSingleCourseData: builder.query<singleCoursesType, string>({
       query: (id) => `/course-details/${id}`,
     }),
+    getCreatorInfo: builder.query<creatorPic, string>({
+      query: (creatorId) => `/course-details/creator?creatorId=${creatorId}`,
+    }),
   }),
 });
 
-export const { useAllCourseDataQuery, useLazyGetSingleCourseDataQuery } =
-  courseApi;
+export const {
+  useAllCourseDataQuery,
+  useLazyGetSingleCourseDataQuery,
+  useLazyGetCreatorInfoQuery,
+} = courseApi;

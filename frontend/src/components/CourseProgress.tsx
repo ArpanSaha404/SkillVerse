@@ -6,6 +6,7 @@ import Navbar from "./Navbar";
 import { chapterType } from "../types/courses";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
+import ReactPlayer from "react-player";
 
 const CourseProgress = () => {
   const [singleCourseData] = useFetch(
@@ -46,11 +47,14 @@ const CourseProgress = () => {
         </div>
         {singleCourseData ? (
           <div className="h-full w-full">
-            <div className="divCenter mx-12 my-8">
-              <video className="w-5/6" controls>
-                <source src="https://www.youtube.com/watch?v=z_B0PF8Ug00&list=RDpOnW2HytGEY&index=19" />
-                Your Browser does not support
-              </video>
+            <div className="divCenter md:ml-12 my-8">
+              <ReactPlayer
+                width={900}
+                height={450}
+                className="w-full h-full"
+                url="https://www.youtube.com/watch?v=PIyf0hMc498"
+                controls
+              />
             </div>
             <div className="md:mx-40">
               <div className="flex align-center justify-between flex-col md:flex-row w-full mb-2">

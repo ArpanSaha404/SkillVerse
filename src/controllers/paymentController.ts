@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Stripe from "stripe";
 import users, { Iuser } from "../models/users";
 import courses, { ICourses } from "../models/courses";
+import payments, { IPayments } from "../models/payments";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-11-20.acacia",
@@ -50,9 +51,24 @@ export const checkoutSession = async (req: Request, res: Response) => {
           },
         } as Stripe.Checkout.SessionCreateParams);
 
+      console.log(session);
+
       if (!session) {
         res.status(400).json({ apiMsg: "Some Error While Creating Session" });
       } else {
+        const newPaymentEntry: IPayments = new payments({
+          paymentId: session.id,
+          paymentStatus: "Pending",
+          courseName: course.name,
+          coursePrice: course.price,
+          createdBy: course.createdBy,
+          courseId: course._id,
+          userId: user._id,
+          creatorId: course.creatorId,
+        });
+
+        await payments.create(newPaymentEntry);
+
         res.status(200).json({
           apiMsg: "Session Created Successfully...",
           url: session.url,

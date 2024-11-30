@@ -1,4 +1,4 @@
-import { IndianRupee } from "lucide-react";
+import { IndianRupee, Loader2 } from "lucide-react";
 import Loading from "./Loading";
 import Navbar from "./Navbar";
 import { Button } from "./ui/button";
@@ -8,27 +8,47 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAppSelector } from "../app/hooks";
 import { useEffect, useState } from "react";
 import { courseType } from "../types/courses";
-import { useLazyGetSingleCourseDataQuery } from "../features/api/courseApi";
-import axios from "axios";
-import { frontend_URL } from "./lib/utils";
+import {
+  useLazyGetCreatorInfoQuery,
+  useLazyGetSingleCourseDataQuery,
+} from "../features/api/courseApi";
+import ReactPlayer from "react-player";
+import { useNewPaymentSessionMutation } from "../features/api/paymentsApi";
+import { toast, Toaster } from "sonner";
+import { toastStyles } from "./toastStyles";
 
 const CourseDetails = () => {
   const { id } = useParams();
   const courseId: string = id ? id : "";
 
-  const [singleCourseData, setSingleCourseData] = useState<courseType>();
-
   const [getSingleCourseData] = useLazyGetSingleCourseDataQuery();
+  const [getCreatorInfo] = useLazyGetCreatorInfoQuery();
+  const [newPaymentSession, { isLoading }] = useNewPaymentSessionMutation();
+
+  const userId = useAppSelector((state) => state.auth._id);
+
+  const [singleCourseData, setSingleCourseData] = useState<courseType>();
+  const [creatorInfo, setCreatorInfo] = useState<{
+    fullName: String;
+    image: string;
+  }>();
 
   useEffect(() => {
     const getCourseData = async () => {
       const res = await getSingleCourseData(courseId);
       if (res && res.data) {
         setSingleCourseData(res.data.courseData);
+        const picRes = await getCreatorInfo(res.data.courseData.coursePic);
+        if (picRes && picRes.data) {
+          setCreatorInfo({
+            fullName: picRes.data.fullName,
+            image: picRes.data.image,
+          });
+        }
       }
     };
     getCourseData();
-  }, [courseId, getSingleCourseData]);
+  }, [courseId, getSingleCourseData, getCreatorInfo]);
 
   const navigate = useNavigate();
   const coursesBought = useAppSelector((state) => state.auth.coursesBought);
@@ -36,31 +56,38 @@ const CourseDetails = () => {
 
   const isCourseCompleted = true;
 
-  const handleCourseProgress = () => {
-    const inputdata = {
-      courseId: courseId,
-      userId: "67484adb28a7dc8a7f5e9058",
-    };
-    axios
-      .post(`${frontend_URL}/api/payments/payment`, inputdata)
-      .then((res) => console.log(res.data))
-      .catch((error) => console.log(error));
-    // if (coursesBought.includes(courseId)) {
-    //   if (isCourseCompleted) {
-    //     //Reset Course Completion
-    //   }
-    //   navigate("/course-progress");
-    // } else {
-    //   //Go to Payments Page
+  const handleCourseProgress = async () => {
+    if (coursesBought.includes(courseId)) {
+      if (isCourseCompleted) {
+        //Reset Course Completion
+      }
+      navigate("/course-progress");
+    } else {
+      try {
+        const inputdata = {
+          courseId: courseId,
+          userId: userId,
+        };
 
-    //   //For now Navigating to Course Progress
-    //   navigate("/course-progress");
-    // }
+        const res = await newPaymentSession(inputdata).unwrap();
+        if (res.url) {
+          window.location.href = res.url;
+        }
+        toast.success(res.apiMsg, {
+          style: toastStyles.success,
+        });
+      } catch (error: any) {
+        toast.error(error.data.apiMsg, {
+          style: toastStyles.error,
+        });
+      }
+    }
   };
 
   return (
     <div>
       <Navbar />
+      <Toaster />
       {singleCourseData ? (
         <div className="divCenter flex-col md:flex-row w-screen">
           <div className="w-1/2 px-8">
@@ -69,8 +96,13 @@ const CourseDetails = () => {
               <div className="flex items-center justify-between w-full">
                 <div className="divCenter text-3xl font-bold">
                   <Avatar className="mr-2 h-10 w-10">
-                    <AvatarImage src="https://github.com/shadcn.png" />
-                    <AvatarFallback>CN</AvatarFallback>
+                    <AvatarImage src={creatorInfo?.image} />
+                    <AvatarFallback>
+                      {creatorInfo?.fullName
+                        .split(" ")
+                        .map((data) => data[0])
+                        .join("")}
+                    </AvatarFallback>
                   </Avatar>
                   {singleCourseData.createdBy}
                 </div>
@@ -92,29 +124,44 @@ const CourseDetails = () => {
           </div>
           <div className="w-full">
             <div className="divCenter flex-col mx-12 my-8">
-              <video className="w-5/6" controls>
-                <source src="https://www.youtube.com/watch?v=z_B0PF8Ug00&list=RDpOnW2HytGEY&index=19" />
-                Your Browser does not support
-              </video>
+              <div className="md:ml-32">
+                <ReactPlayer
+                  className="w-full h-full"
+                  url={
+                    singleCourseData.chapters[singleCourseData.freeChapterIdx]
+                      .chapterVidURL
+                  }
+                  controls
+                />
+              </div>
               <div className="w-5/6 flex items-center justify-end m-8 pr-8 gap-4">
-                <Button
-                  onClick={handleCourseProgress}
-                  className="text-white bg-hvrBrwn rounded-md hover:bg-hdrBrwn transition-transform duration-300 ease-in-out active:scale-90"
-                >
-                  {coursesBought.includes(courseId) ? (
-                    isCourseCompleted ? (
-                      "Rewatch Chapter"
-                    ) : (
+                {!isLoading ? (
+                  <Button
+                    onClick={handleCourseProgress}
+                    className="text-white bg-hvrBrwn rounded-md hover:bg-hdrBrwn transition-transform duration-300 ease-in-out active:scale-90"
+                  >
+                    {coursesBought.includes(courseId) ? (
+                      isCourseCompleted ? (
+                        "Rewatch Course"
+                      ) : (
+                        "Go to Course"
+                      )
+                    ) : coursesCreated.includes(courseId) ? (
                       "Go to Course"
-                    )
-                  ) : coursesCreated.includes(courseId) ? (
-                    "Go to Course"
-                  ) : (
-                    <>
-                      Enroll for : <IndianRupee /> {singleCourseData.price}
-                    </>
-                  )}
-                </Button>
+                    ) : (
+                      <>
+                        Enroll for : <IndianRupee /> {singleCourseData.price}
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <Button
+                    disabled
+                    className="divCenter gap-4 py-2 mt-4 bg-hdrBrwn text-white rounded-md"
+                  >
+                    <Loader2 className="animate-spin" /> Please Wait...
+                  </Button>
+                )}
               </div>
             </div>
           </div>

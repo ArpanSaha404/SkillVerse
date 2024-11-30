@@ -27,7 +27,9 @@ export const viewallCategory = async (
   res: Response
 ): Promise<void> => {
   try {
-    const categories = await courseCategories.find();
+    const categories = await courseCategories
+      .find()
+      .select("-createdAt -updatedAt -__v");
     res.status(200).json({
       apiMsg: "Course Category Fteched Successfully",
       categories,

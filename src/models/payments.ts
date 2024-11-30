@@ -4,8 +4,9 @@ export interface IPayments extends Document {
   paymentId: string;
   paymentStatus: string;
   courseName: string;
+  coursePrice: number;
   createdBy: string;
-  coursesId: mongoose.Schema.Types.ObjectId;
+  courseId: mongoose.Schema.Types.ObjectId;
   userId: mongoose.Schema.Types.ObjectId;
   creatorId: mongoose.Schema.Types.ObjectId;
 }
@@ -36,13 +37,16 @@ const PaymentSchema = new mongoose.Schema<IPayments>(
       type: String,
       default: "",
     },
+    coursePrice: {
+      type: Number,
+      required: true,
+    },
     createdBy: {
       type: String,
       required: true,
       default: "",
     },
-
-    coursesId: {
+    courseId: {
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "Course",

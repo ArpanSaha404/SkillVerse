@@ -10,6 +10,7 @@ export type courseType = {
   _id: string;
   name: string;
   createdBy: string;
+  creatorId: string;
   subTitle: string;
   desc: string;
   coursePic: string;
@@ -19,6 +20,12 @@ export type courseType = {
   chapters: chapterType[];
   isPublished: boolean;
   boughtby: string[];
+};
+
+export type creatorPic = {
+  apiMsg: string;
+  fullName: string;
+  image: string;
 };
 
 export type allCoursesType = {

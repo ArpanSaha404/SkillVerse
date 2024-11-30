@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { console } from "inspector";
 import Course, { ICourses } from "../models/courses";
+import users, { Iuser } from "../models/users";
 
 export const addCourse = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -52,6 +53,28 @@ export const viewSingleCourse = async (
       res.status(200).json({
         apiMsg: "Course Fetched Successfully",
         courseData,
+      });
+    }
+  } catch (error: any) {
+    console.error(error);
+    res.status(400).json({ apiMsg: "Some Error", errorMsg: error.message });
+  }
+};
+
+export const getCreatorDetails = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { creatorId } = req.query;
+  try {
+    const user: Iuser | null = await users.findById(creatorId);
+    if (!user) {
+      res.status(400).json({ apiMsg: "Creator ID is Invalid" });
+    } else {
+      res.status(200).json({
+        apiMsg: "Creator Details Fetched Successfully...",
+        fullName: user.fullName,
+        image: user.pic,
       });
     }
   } catch (error: any) {
