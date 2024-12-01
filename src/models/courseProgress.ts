@@ -1,6 +1,6 @@
 import mongoose, { Document } from "mongoose";
 
-export type chapterProgress = {
+export type chapterProgressType = {
   chapterTitle: string;
   chapterDesc: string;
   chapterVidURL: string;
@@ -8,6 +8,7 @@ export type chapterProgress = {
 };
 
 export interface ICourseProgress extends Document {
+  _id: mongoose.Schema.Types.ObjectId;
   name: string;
   desc: string;
   price: number;
@@ -16,17 +17,18 @@ export interface ICourseProgress extends Document {
   courseId: mongoose.Schema.Types.ObjectId;
   userId: mongoose.Schema.Types.ObjectId;
   creatorId: mongoose.Schema.Types.ObjectId;
+  paymentMongoId: mongoose.Schema.Types.ObjectId;
+  paymentId: string;
   isCourseBought: boolean;
   isCourseCreated: boolean;
   isCourseCompletd: boolean;
-  chapters: chapterProgress[];
+  chapters: chapterProgressType[];
 }
 
 const CourseProgress = new mongoose.Schema<ICourseProgress>(
   {
     name: {
       type: String,
-      unique: true,
       required: true,
       ref: "Course",
     },
@@ -65,6 +67,18 @@ const CourseProgress = new mongoose.Schema<ICourseProgress>(
       type: mongoose.Schema.Types.ObjectId,
       required: true,
       ref: "User",
+    },
+    paymentMongoId: {
+      type: mongoose.Schema.Types.ObjectId,
+      unique: true,
+      required: true,
+      ref: "Payment",
+    },
+    paymentId: {
+      type: String,
+      unique: true,
+      required: true,
+      ref: "Course",
     },
     isCourseBought: {
       type: Boolean,

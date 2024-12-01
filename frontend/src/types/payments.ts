@@ -5,5 +5,6 @@ export type paymentReq = {
 
 export type paymentRes = {
   apiMsg: string;
+  apiMsg2: string;
   url: string;
 };

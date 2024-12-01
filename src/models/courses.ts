@@ -9,6 +9,7 @@ export type chapterType = {
 };
 
 export interface ICourses extends Document {
+  _id: mongoose.Schema.Types.ObjectId;
   name: string;
   createdBy: string;
   creatorId: mongoose.Schema.Types.ObjectId;

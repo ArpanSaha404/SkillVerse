@@ -16,6 +16,7 @@ import ReactPlayer from "react-player";
 import { useNewPaymentSessionMutation } from "../features/api/paymentsApi";
 import { toast, Toaster } from "sonner";
 import { toastStyles } from "./toastStyles";
+import { paymentRes } from "../types/payments";
 
 const CourseDetails = () => {
   const { id } = useParams();
@@ -69,11 +70,11 @@ const CourseDetails = () => {
           userId: userId,
         };
 
-        const res = await newPaymentSession(inputdata).unwrap();
+        const res: paymentRes = await newPaymentSession(inputdata).unwrap();
         if (res.url) {
           window.location.href = res.url;
         }
-        toast.success(res.apiMsg, {
+        toast.success(res.apiMsg + "\n" + res.apiMsg2, {
           style: toastStyles.success,
         });
       } catch (error: any) {
