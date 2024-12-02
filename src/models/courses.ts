@@ -89,7 +89,6 @@ const Courses = new mongoose.Schema<ICourses>(
           type: Boolean,
           default: true,
         },
-        default: [],
       },
     ],
     isPublished: {

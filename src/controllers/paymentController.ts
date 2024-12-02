@@ -8,7 +8,6 @@ import courseProgress, {
   chapterProgressType,
   ICourseProgress,
 } from "../models/courseProgress";
-import mongoose from "mongoose";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: "2024-11-20.acacia",
@@ -123,9 +122,8 @@ export const checkoutSession = async (
         await newPayment.save();
 
         res.status(200).json({
-          apiMsg: "Session Created Successfully...",
-          apiMsg2:
-            "Please Wait you'll be redirected to Payment Page Shortly...",
+          apiMsg: "Please Wait you'll be redirected to Payment Page Shortly...",
+          apiMsg2: "Session Created Successfully...",
           url: session.url,
         });
       }

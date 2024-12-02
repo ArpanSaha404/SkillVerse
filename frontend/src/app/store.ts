@@ -5,6 +5,7 @@ import { persistReducer } from "redux-persist";
 import { authApi } from "../features/api/authApi";
 import { courseApi } from "../features/api/courseApi";
 import { categoryApi } from "../features/api/categoryApi";
+import { courseProgressApi } from "../features/api/courseProgressApi";
 import { paymentsApi } from "../features/api/paymentsApi";
 
 const persistConfig = {
@@ -22,6 +23,7 @@ export const store = configureStore({
       authApi.middleware,
       courseApi.middleware,
       categoryApi.middleware,
+      courseProgressApi.middleware,
       paymentsApi.middleware
     ),
 });

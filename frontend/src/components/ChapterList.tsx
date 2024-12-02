@@ -1,5 +1,9 @@
-import { LockKeyhole, LockKeyholeOpen, TableOfContents } from "lucide-react";
-import { chapterType } from "../types/courses";
+import {
+  Loader2,
+  LockKeyhole,
+  LockKeyholeOpen,
+  TableOfContents,
+} from "lucide-react";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import {
@@ -10,22 +14,65 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "./ui/sheet";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Loading from "./Loading";
+import {
+  chapterProgressResType,
+  chapterProgressType,
+  commonProgressResType,
+  updateChapterProgress,
+} from "../types/courseProgress";
+import {
+  useLazyFetchChapterProgressInfoQuery,
+  useUpdateChapterProgessMutation,
+} from "../features/api/courseProgressApi";
+import { toast, Toaster } from "sonner";
+import { toastStyles } from "./toastStyles";
 
 interface chaptersListProps {
-  chapters: chapterType[];
+  progresscode: string;
   freeChapterIdx: number;
-  isBought: boolean;
+  isCourseBought: boolean;
+  handleChapterChange: (idx: number) => void;
+}
+
+interface mobileChaptersListProps {
+  chapterProgressInfo: chapterProgressType[];
+  isLoading: boolean;
+  freeChapterIdx: number;
+  isCourseBought: boolean;
+  handleUpdateChapterProgress: (idx: number) => void;
 }
 
 const ChapterList: React.FC<chaptersListProps> = ({
-  chapters,
   freeChapterIdx,
-  isBought,
+  isCourseBought,
+  progresscode,
+  handleChapterChange,
 }) => {
+  const [fetchChapterProgressInfo, { isLoading }] =
+    useLazyFetchChapterProgressInfoQuery();
+
+  const [chapterProgressInfo, setChapterProgressInfo] =
+    useState<chapterProgressType[]>();
   const [isIdx, setIsIdx] = useState<number>();
   const [isDescVisible, setIsDescVisible] = useState<boolean>(false);
+
+  useEffect(() => {
+    const fetchChapterProgressData = async () => {
+      const res: chapterProgressResType = await fetchChapterProgressInfo({
+        progresscode,
+      }).unwrap();
+
+      if (res && res.chapterProgressInfo) {
+        setChapterProgressInfo(res.chapterProgressInfo);
+      }
+    };
+    fetchChapterProgressData();
+  }, [progresscode, fetchChapterProgressInfo]);
+
+  const [updateCourseProgess, { isLoading: isUpdateLoading }] =
+    useUpdateChapterProgessMutation();
 
   const handleChapterBox = (idx: number) => {
     if (idx === isIdx) {
@@ -36,69 +83,143 @@ const ChapterList: React.FC<chaptersListProps> = ({
     setIsIdx(idx);
   };
 
-  console.log(chapters);
-  console.log(isBought);
-  console.log(freeChapterIdx);
+  const handleCourseAlert = (idx: number) => {
+    if (!isCourseBought && idx !== freeChapterIdx) {
+      toast.error("Please Purchase Course to View Details!!!", {
+        style: toastStyles.error,
+      });
+    }
+  };
+
+  const handleUpdateChapterProgress = async (idx: number) => {
+    if (chapterProgressInfo) {
+      const inputData: updateChapterProgress = {
+        courseProgressId: progresscode,
+        idx,
+        status: !chapterProgressInfo[idx].isChapterCompleted,
+      };
+      try {
+        const res: commonProgressResType = await updateCourseProgess(
+          inputData
+        ).unwrap();
+        if (res.apiMsg) {
+          const updatedChapterInfo: chapterProgressResType =
+            await fetchChapterProgressInfo({
+              progresscode,
+            }).unwrap();
+          setChapterProgressInfo(updatedChapterInfo.chapterProgressInfo);
+          toast.success(res.apiMsg, {
+            style: toastStyles.success,
+          });
+        }
+      } catch (error: any) {
+        toast.error(error.data.apiMsg, {
+          style: toastStyles.error,
+        });
+      }
+    }
+  };
 
   return (
     <div>
+      <Toaster />
       <div className="flex items-start justify-between m-4">
         <div className="md:hidden lg:hidden">
-          <MobileChapterList
-            chapters={chapters}
-            freeChapterIdx={freeChapterIdx}
-            isBought={isBought}
-          />
+          {chapterProgressInfo ? (
+            <MobileChapterList
+              chapterProgressInfo={chapterProgressInfo}
+              isLoading={isLoading}
+              freeChapterIdx={freeChapterIdx}
+              isCourseBought={isCourseBought}
+              handleUpdateChapterProgress={handleUpdateChapterProgress}
+            />
+          ) : (
+            <></>
+          )}
         </div>
         <div className="hidden md:divCenter flex-col space-y-8 w-full">
           <h1 className="text-xl font-semibold">Chapter List :</h1>
-          {chapters && isBought ? (
+          {chapterProgressInfo ? (
             <div className="flex w-full items-start justify-start space-y-4 flex-col">
-              {chapters.map((data: chapterType, idx: number) => (
-                <div
-                  key={idx}
-                  className="divCenter flex-col h-auto w-full rounded-lg border-2 border-brwn text-center text-xl hover:bg-gray-100"
-                  style={{ backgroundColor: idx === isIdx ? "#f3f4f6" : "" }}
-                >
-                  <button
-                    onClick={() => handleChapterBox(idx)}
-                    className="divCenter px-4 py-2 h-full w-full ext-brwn border-solid border-b-2 border-hvrBrwn shadow-none bg-white text-black hover:bg-gray-100"
+              {chapterProgressInfo.map(
+                (data: chapterProgressType, idx: number) => (
+                  <div
+                    key={idx}
+                    className="divCenter flex-col h-auto w-full rounded-lg border-2 border-brwn text-center text-xl hover:bg-gray-100"
+                    onClick={() => handleCourseAlert(idx)}
                     style={{ backgroundColor: idx === isIdx ? "#f3f4f6" : "" }}
                   >
-                    {isBought ? (
-                      <LockKeyholeOpen className="mr-2" />
-                    ) : idx === freeChapterIdx ? (
-                      <LockKeyholeOpen className="mr-2" />
-                    ) : (
-                      <LockKeyhole className="mr-2" />
-                    )}
-                    {data.chapterTitle}
-                  </button>
-                  <div className="w-full space-y-4">
-                    {isIdx === idx &&
-                    isDescVisible &&
-                    (isBought || idx === freeChapterIdx) ? (
-                      <div>
+                    <button
+                      onClick={() => handleChapterBox(idx)}
+                      className="divCenter px-4 py-2 h-full w-full ext-brwn border-solid border-b-2 border-hvrBrwn shadow-none bg-white text-black hover:bg-gray-100"
+                      style={{
+                        backgroundColor: idx === isIdx ? "#f3f4f6" : "",
+                      }}
+                    >
+                      {isCourseBought ? (
+                        <LockKeyholeOpen className="mr-2" />
+                      ) : idx === freeChapterIdx ? (
+                        <LockKeyholeOpen className="mr-2" />
+                      ) : (
+                        <LockKeyhole className="mr-2" />
+                      )}
+                      {data.chapterTitle}
+                    </button>
+                    <div className="w-full space-y-4">
+                      {isIdx === idx &&
+                      isDescVisible &&
+                      (isCourseBought || idx === freeChapterIdx) ? (
                         <div>
-                          {data.chapterDesc
-                            ? data.chapterDesc
-                            : "No Description Provided for this Chapter"}
+                          <div>
+                            {data.chapterDesc
+                              ? data.chapterDesc
+                              : "No Description Provided for this Chapter"}
+                          </div>
+                          <div className="w-auto flex justify-end items-end mx-4 my-4 gap-4">
+                            <Button
+                              onClick={() => {
+                                setIsDescVisible(false);
+                                handleChapterChange(idx);
+                              }}
+                              className="bg-brwn text-white rounded-md hover:bg-hvrBrwn transition-transform duration-300 ease-in-out active:scale-90"
+                            >
+                              {data.isChapterCompleted
+                                ? "Rewatch Video"
+                                : "Watch Video"}
+                            </Button>
+                            {isUpdateLoading ? (
+                              <Button
+                                disabled
+                                className=" divCenter gap-4 py-2 mt-4 bg-hdrBrwn text-white rounded-md"
+                              >
+                                <Loader2 className="animate-spin" /> Please
+                                Wait...
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={() => {
+                                  setIsDescVisible(false);
+                                  handleUpdateChapterProgress(idx);
+                                }}
+                                className="bg-brwn text-white rounded-md hover:bg-hvrBrwn transition-transform duration-300 ease-in-out active:scale-90"
+                              >
+                                {data.isChapterCompleted
+                                  ? "Mark as Incomplete"
+                                  : "Mark as Complete"}
+                              </Button>
+                            )}
+                          </div>
                         </div>
-                        <div className="w-auto flex justify-end items-end mx-4 my-4 gap-4">
-                          <Button>Watch Video</Button>
-                          <Button>Mark as Complete</Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <></>
-                    )}
+                      ) : (
+                        <></>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              )}
             </div>
           ) : (
             <>
-              Hello
               <Loading skeletonType="chapterList" />
             </>
           )}
@@ -108,10 +229,12 @@ const ChapterList: React.FC<chaptersListProps> = ({
   );
 };
 
-const MobileChapterList: React.FC<chaptersListProps> = ({
-  chapters,
+const MobileChapterList: React.FC<mobileChaptersListProps> = ({
+  chapterProgressInfo,
+  isLoading,
   freeChapterIdx,
-  isBought,
+  isCourseBought,
+  handleUpdateChapterProgress,
 }) => {
   const [isIdx, setIsIdx] = useState<number>();
   const [isDescVisible, setIsDescVisible] = useState<boolean>(false);
@@ -139,50 +262,73 @@ const MobileChapterList: React.FC<chaptersListProps> = ({
           </SheetTitle>
         </SheetHeader>
         <Separator />
-        {chapters && freeChapterIdx && isBought ? (
+        {chapterProgressInfo ? (
           <SheetDescription className="flex-1">
             <div className="mt-4 text-hvrBrwn text-xl space-y-4">
-              {chapters.map((data: chapterType, idx: number) => (
-                <div
-                  key={idx}
-                  className="divCenter flex-col h-auto w-full rounded-lg border-2 border-brwn text-center text-xl hover:bg-gray-100"
-                  style={{ backgroundColor: idx === isIdx ? "#f3f4f6" : "" }}
-                >
-                  <button
-                    onClick={() => handleChapterBox(idx)}
-                    className="divCenter px-4 py-2 h-full w-full text-brwn border-solid border-b-2 border-hvrBrwn shadow-none bg-white text-black hover:bg-gray-100"
+              {chapterProgressInfo.map(
+                (data: chapterProgressType, idx: number) => (
+                  <div
+                    key={idx}
+                    className="divCenter flex-col h-auto w-full rounded-lg border-2 border-brwn text-center text-xl hover:bg-gray-100"
                     style={{ backgroundColor: idx === isIdx ? "#f3f4f6" : "" }}
                   >
-                    {isBought ? (
-                      <LockKeyholeOpen className="mr-2" />
-                    ) : idx === freeChapterIdx ? (
-                      <LockKeyholeOpen className="mr-2" />
-                    ) : (
-                      <LockKeyhole className="mr-2" />
-                    )}
-                    {data.chapterTitle}
-                  </button>
-                  <div className="w-full space-y-4">
-                    {isIdx === idx &&
-                    isDescVisible &&
-                    (isBought || idx === freeChapterIdx) ? (
-                      <div>
+                    <button
+                      onClick={() => handleChapterBox(idx)}
+                      className="divCenter px-4 py-2 h-full w-full text-brwn border-solid border-b-2 border-hvrBrwn shadow-none bg-white text-black hover:bg-gray-100"
+                      style={{
+                        backgroundColor: idx === isIdx ? "#f3f4f6" : "",
+                      }}
+                    >
+                      {isCourseBought ? (
+                        <LockKeyholeOpen className="mr-2" />
+                      ) : idx === freeChapterIdx ? (
+                        <LockKeyholeOpen className="mr-2" />
+                      ) : (
+                        <LockKeyhole className="mr-2" />
+                      )}
+                      {data.chapterTitle}
+                    </button>
+                    <div className="w-full space-y-4">
+                      {isIdx === idx &&
+                      isDescVisible &&
+                      (isCourseBought || idx === freeChapterIdx) ? (
                         <div>
-                          {data.chapterDesc
-                            ? data.chapterDesc
-                            : "No Description Provided for this Chapter"}
+                          <div>
+                            {data.chapterDesc
+                              ? data.chapterDesc
+                              : "No Description Provided for this Chapter"}
+                          </div>
+                          <div className="w-auto flex justify-end items-end mx-4 my-4 gap-4">
+                            {isLoading ? (
+                              <Button
+                                disabled
+                                className=" divCenter gap-4 py-2 mt-4 bg-hdrBrwn text-white rounded-md"
+                              >
+                                <Loader2 className="animate-spin" /> Please
+                                Wait...
+                              </Button>
+                            ) : (
+                              <Button
+                                onClick={() => {
+                                  setIsDescVisible(false);
+                                  handleUpdateChapterProgress(idx);
+                                }}
+                                className="bg-brwn text-white rounded-md hover:bg-hvrBrwn transition-transform duration-300 ease-in-out active:scale-90"
+                              >
+                                {data.isChapterCompleted
+                                  ? "Mark as Incomplete"
+                                  : "Mark as Complete"}
+                              </Button>
+                            )}
+                          </div>
                         </div>
-                        <div className="w-auto flex justify-end items-end mx-4 my-4 gap-4">
-                          <Button>Watch Video</Button>
-                          <Button>Mark as Complete</Button>
-                        </div>
-                      </div>
-                    ) : (
-                      <></>
-                    )}
+                      ) : (
+                        <></>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              )}
             </div>
           </SheetDescription>
         ) : (

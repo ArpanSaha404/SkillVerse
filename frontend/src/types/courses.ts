@@ -1,4 +1,5 @@
 export type chapterType = {
+  _id: string;
   chapterTitle: string;
   chapterDesc: string;
   chapterVidURL: string;

@@ -74,7 +74,7 @@ const CourseDetails = () => {
         if (res.url) {
           window.location.href = res.url;
         }
-        toast.success(res.apiMsg + "\n" + res.apiMsg2, {
+        toast.success(res.apiMsg, {
           style: toastStyles.success,
         });
       } catch (error: any) {

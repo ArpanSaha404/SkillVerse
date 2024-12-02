@@ -110,7 +110,6 @@ const CourseProgress = new mongoose.Schema<ICourseProgress>(
           type: Boolean,
           default: false,
         },
-        default: [],
       },
     ],
   },
