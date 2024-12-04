@@ -21,7 +21,7 @@ export interface ICourseProgress extends Document {
   paymentId: string;
   isCourseBought: boolean;
   isCourseCreated: boolean;
-  isCourseCompletd: boolean;
+  isCourseCompleted: boolean;
   chapters: chapterProgressType[];
 }
 
@@ -88,7 +88,10 @@ const CourseProgress = new mongoose.Schema<ICourseProgress>(
       type: Boolean,
       default: false,
     },
-
+    isCourseCompleted: {
+      type: Boolean,
+      default: false,
+    },
     chapters: [
       {
         chapterTitle: {

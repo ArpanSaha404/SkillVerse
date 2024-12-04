@@ -68,7 +68,7 @@ const SignUp = () => {
   };
 
   return (
-    <div className="max-w-screen mx-auto p-6 bg-white rounded-lg shadow-lg min-h-screen space-y-2 text-hvrBrwn">
+    <div className="max-w-screen mx-auto px-6 bg-white rounded-lg shadow-lg min-h-screen space-y-2 text-hvrBrwn">
       <Navbar />
       <Toaster />
       <div className="flex-col divCenter">

@@ -14,65 +14,38 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "./ui/sheet";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Loading from "./Loading";
 import {
-  chapterProgressResType,
   chapterProgressType,
-  commonProgressResType,
-  updateChapterProgress,
+  courseProgressType,
 } from "../types/courseProgress";
-import {
-  useLazyFetchChapterProgressInfoQuery,
-  useUpdateChapterProgessMutation,
-} from "../features/api/courseProgressApi";
 import { toast, Toaster } from "sonner";
 import { toastStyles } from "./toastStyles";
 
 interface chaptersListProps {
-  progresscode: string;
-  freeChapterIdx: number;
-  isCourseBought: boolean;
+  courseProgressInfo: courseProgressType;
+  isChapterUpdateLoading: boolean;
   handleChapterChange: (idx: number) => void;
+  handleUpdateChapterProgress: (idx: number) => void;
 }
 
 interface mobileChaptersListProps {
-  chapterProgressInfo: chapterProgressType[];
-  isLoading: boolean;
+  courseProgressInfo: courseProgressType;
+  isChapterUpdateLoading: boolean;
   freeChapterIdx: number;
   isCourseBought: boolean;
   handleUpdateChapterProgress: (idx: number) => void;
 }
 
 const ChapterList: React.FC<chaptersListProps> = ({
-  freeChapterIdx,
-  isCourseBought,
-  progresscode,
+  courseProgressInfo,
+  isChapterUpdateLoading,
   handleChapterChange,
+  handleUpdateChapterProgress,
 }) => {
-  const [fetchChapterProgressInfo, { isLoading }] =
-    useLazyFetchChapterProgressInfoQuery();
-
-  const [chapterProgressInfo, setChapterProgressInfo] =
-    useState<chapterProgressType[]>();
   const [isIdx, setIsIdx] = useState<number>();
   const [isDescVisible, setIsDescVisible] = useState<boolean>(false);
-
-  useEffect(() => {
-    const fetchChapterProgressData = async () => {
-      const res: chapterProgressResType = await fetchChapterProgressInfo({
-        progresscode,
-      }).unwrap();
-
-      if (res && res.chapterProgressInfo) {
-        setChapterProgressInfo(res.chapterProgressInfo);
-      }
-    };
-    fetchChapterProgressData();
-  }, [progresscode, fetchChapterProgressInfo]);
-
-  const [updateCourseProgess, { isLoading: isUpdateLoading }] =
-    useUpdateChapterProgessMutation();
 
   const handleChapterBox = (idx: number) => {
     if (idx === isIdx) {
@@ -84,39 +57,13 @@ const ChapterList: React.FC<chaptersListProps> = ({
   };
 
   const handleCourseAlert = (idx: number) => {
-    if (!isCourseBought && idx !== freeChapterIdx) {
+    if (
+      !courseProgressInfo.isCourseBought &&
+      idx !== courseProgressInfo.freeChapterIdx
+    ) {
       toast.error("Please Purchase Course to View Details!!!", {
         style: toastStyles.error,
       });
-    }
-  };
-
-  const handleUpdateChapterProgress = async (idx: number) => {
-    if (chapterProgressInfo) {
-      const inputData: updateChapterProgress = {
-        courseProgressId: progresscode,
-        idx,
-        status: !chapterProgressInfo[idx].isChapterCompleted,
-      };
-      try {
-        const res: commonProgressResType = await updateCourseProgess(
-          inputData
-        ).unwrap();
-        if (res.apiMsg) {
-          const updatedChapterInfo: chapterProgressResType =
-            await fetchChapterProgressInfo({
-              progresscode,
-            }).unwrap();
-          setChapterProgressInfo(updatedChapterInfo.chapterProgressInfo);
-          toast.success(res.apiMsg, {
-            style: toastStyles.success,
-          });
-        }
-      } catch (error: any) {
-        toast.error(error.data.apiMsg, {
-          style: toastStyles.error,
-        });
-      }
     }
   };
 
@@ -125,12 +72,12 @@ const ChapterList: React.FC<chaptersListProps> = ({
       <Toaster />
       <div className="flex items-start justify-between m-4">
         <div className="md:hidden lg:hidden">
-          {chapterProgressInfo ? (
+          {courseProgressInfo ? (
             <MobileChapterList
-              chapterProgressInfo={chapterProgressInfo}
-              isLoading={isLoading}
-              freeChapterIdx={freeChapterIdx}
-              isCourseBought={isCourseBought}
+              courseProgressInfo={courseProgressInfo}
+              isChapterUpdateLoading={isChapterUpdateLoading}
+              freeChapterIdx={courseProgressInfo.freeChapterIdx}
+              isCourseBought={courseProgressInfo.isCourseBought}
               handleUpdateChapterProgress={handleUpdateChapterProgress}
             />
           ) : (
@@ -139,9 +86,9 @@ const ChapterList: React.FC<chaptersListProps> = ({
         </div>
         <div className="hidden md:divCenter flex-col space-y-8 w-full">
           <h1 className="text-xl font-semibold">Chapter List :</h1>
-          {chapterProgressInfo ? (
+          {courseProgressInfo ? (
             <div className="flex w-full items-start justify-start space-y-4 flex-col">
-              {chapterProgressInfo.map(
+              {courseProgressInfo.chapters.map(
                 (data: chapterProgressType, idx: number) => (
                   <div
                     key={idx}
@@ -156,9 +103,9 @@ const ChapterList: React.FC<chaptersListProps> = ({
                         backgroundColor: idx === isIdx ? "#f3f4f6" : "",
                       }}
                     >
-                      {isCourseBought ? (
+                      {courseProgressInfo.isCourseBought ? (
                         <LockKeyholeOpen className="mr-2" />
-                      ) : idx === freeChapterIdx ? (
+                      ) : idx === courseProgressInfo.freeChapterIdx ? (
                         <LockKeyholeOpen className="mr-2" />
                       ) : (
                         <LockKeyhole className="mr-2" />
@@ -168,7 +115,8 @@ const ChapterList: React.FC<chaptersListProps> = ({
                     <div className="w-full space-y-4">
                       {isIdx === idx &&
                       isDescVisible &&
-                      (isCourseBought || idx === freeChapterIdx) ? (
+                      (courseProgressInfo.isCourseBought ||
+                        idx === courseProgressInfo.freeChapterIdx) ? (
                         <div>
                           <div>
                             {data.chapterDesc
@@ -187,7 +135,7 @@ const ChapterList: React.FC<chaptersListProps> = ({
                                 ? "Rewatch Video"
                                 : "Watch Video"}
                             </Button>
-                            {isUpdateLoading ? (
+                            {isChapterUpdateLoading ? (
                               <Button
                                 disabled
                                 className=" divCenter gap-4 py-2 mt-4 bg-hdrBrwn text-white rounded-md"
@@ -230,8 +178,8 @@ const ChapterList: React.FC<chaptersListProps> = ({
 };
 
 const MobileChapterList: React.FC<mobileChaptersListProps> = ({
-  chapterProgressInfo,
-  isLoading,
+  courseProgressInfo,
+  isChapterUpdateLoading,
   freeChapterIdx,
   isCourseBought,
   handleUpdateChapterProgress,
@@ -262,10 +210,10 @@ const MobileChapterList: React.FC<mobileChaptersListProps> = ({
           </SheetTitle>
         </SheetHeader>
         <Separator />
-        {chapterProgressInfo ? (
+        {courseProgressInfo ? (
           <SheetDescription className="flex-1">
             <div className="mt-4 text-hvrBrwn text-xl space-y-4">
-              {chapterProgressInfo.map(
+              {courseProgressInfo.chapters.map(
                 (data: chapterProgressType, idx: number) => (
                   <div
                     key={idx}
@@ -299,7 +247,7 @@ const MobileChapterList: React.FC<mobileChaptersListProps> = ({
                               : "No Description Provided for this Chapter"}
                           </div>
                           <div className="w-auto flex justify-end items-end mx-4 my-4 gap-4">
-                            {isLoading ? (
+                            {isChapterUpdateLoading ? (
                               <Button
                                 disabled
                                 className=" divCenter gap-4 py-2 mt-4 bg-hdrBrwn text-white rounded-md"

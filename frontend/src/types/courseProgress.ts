@@ -24,7 +24,7 @@ export type courseProgressType = {
   paymentId: string;
   isCourseBought: boolean;
   isCourseCreated: boolean;
-  isCourseCompletd: boolean;
+  isCourseCompleted: boolean;
   chapters: chapterProgressType[];
   updatedAt?: Date;
 };

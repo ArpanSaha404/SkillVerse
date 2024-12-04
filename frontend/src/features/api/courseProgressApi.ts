@@ -1,5 +1,4 @@
 import {
-  commonProgressResType,
   courseProgressResType,
   updateChapterProgress,
 } from "../../types/courseProgress";
@@ -22,16 +21,10 @@ export const courseProgressApi = createApi({
         url: "/course-progress",
         params: { progresscode },
       }),
-    }),
-    fetchChapterProgressInfo: builder.query({
-      query: ({ progresscode }) => ({
-        url: "/chapter-progress",
-        params: { progresscode },
-      }),
       providesTags: ["Refetch_Progress"],
     }),
     updateChapterProgess: builder.mutation<
-      commonProgressResType,
+      courseProgressResType,
       updateChapterProgress
     >({
       query: (inputData) => ({
@@ -50,13 +43,36 @@ export const courseProgressApi = createApi({
         method: "PATCH",
         body: inputData,
       }),
+      invalidatesTags: ["Refetch_Progress"],
+    }),
+    updateVideoProgess: builder.mutation<
+      courseProgressResType,
+      { courseProgressId: string; idx: number; isCourseCompleted: boolean }
+    >({
+      query: (inputData) => ({
+        url: "/progress-update",
+        method: "PATCH",
+        body: inputData,
+      }),
+      invalidatesTags: ["Refetch_Progress"],
+    }),
+    updateVideoChangeIdx: builder.mutation<
+      courseProgressResType,
+      { courseProgressId: string; idx: number }
+    >({
+      query: (inputData) => ({
+        url: "/currvideo-update",
+        method: "PATCH",
+        body: inputData,
+      }),
     }),
   }),
 });
 
 export const {
   useLazyFetchCourseProgressInfoQuery,
-  useLazyFetchChapterProgressInfoQuery,
   useUpdateChapterProgessMutation,
   useUpdateCourseProgessMutation,
+  useUpdateVideoProgessMutation,
+  useUpdateVideoChangeIdxMutation,
 } = courseProgressApi;

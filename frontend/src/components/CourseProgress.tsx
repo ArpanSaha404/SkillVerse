@@ -7,12 +7,16 @@ import { Separator } from "./ui/separator";
 import ReactPlayer from "react-player";
 import {
   useLazyFetchCourseProgressInfoQuery,
+  useUpdateChapterProgessMutation,
   useUpdateCourseProgessMutation,
+  useUpdateVideoChangeIdxMutation,
+  useUpdateVideoProgessMutation,
 } from "../features/api/courseProgressApi";
 import { useEffect, useState } from "react";
 import {
   courseProgressResType,
   courseProgressType,
+  updateChapterProgress,
 } from "../types/courseProgress";
 import { useLocation, useNavigate } from "react-router-dom";
 import { paymentRes } from "../types/payments";
@@ -29,18 +33,25 @@ const CourseProgress = () => {
   const [fetchCourseProgressInfo, { isLoading }] =
     useLazyFetchCourseProgressInfoQuery();
 
-  const [courseProgressInfo, setCourseProgressInfo] =
-    useState<courseProgressType>();
-
   const [newPaymentSession, { isLoading: isCourseUpdateLoading1 }] =
     useNewPaymentSessionMutation();
 
   const [updateCourseProgess, { isLoading: isCourseUpdateLoading2 }] =
     useUpdateCourseProgessMutation();
 
+  const [updateChapterProgress, { isLoading: isChapterUpdateLoading }] =
+    useUpdateChapterProgessMutation();
+
+  const [updateVideoProgess] = useUpdateVideoProgessMutation();
+
+  const [updateVideoChangeIdx] = useUpdateVideoChangeIdxMutation();
+
   const navigate = useNavigate();
+  const [courseProgressInfo, setCourseProgressInfo] =
+    useState<courseProgressType>();
   const [currChapterIdx, setCurrChapterIdx] = useState<number>(0);
   const [showConfetti, setShowConfetti] = useState<boolean>(false);
+  const [isPlaying, setIsPlaying] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchCourseProgressData = async () => {
@@ -55,28 +66,76 @@ const CourseProgress = () => {
     fetchCourseProgressData();
   }, [progresscode, fetchCourseProgressInfo]);
 
-  const handleChapterChange = (idx: number) => {
-    setCurrChapterIdx(idx);
+  const handleChapterChange = async (idx: number) => {
+    if (idx !== currChapterIdx) {
+      try {
+        const inputData = {
+          courseProgressId: progresscode,
+          idx,
+        };
+        const res: courseProgressResType = await updateVideoChangeIdx(
+          inputData
+        ).unwrap();
+        if (res.courseProgressInfo) {
+          setCourseProgressInfo(res.courseProgressInfo);
+          setCurrChapterIdx(idx);
+          setIsPlaying(true);
+        }
+      } catch (error: any) {
+        toast.error(error.data.apiMsg, {
+          style: toastStyles.error,
+        });
+      }
+    }
+  };
+
+  const handleUpdateChapterProgress = async (idx: number) => {
+    if (courseProgressInfo) {
+      const inputData: updateChapterProgress = {
+        courseProgressId: progresscode,
+        idx,
+        status: !courseProgressInfo.chapters[idx].isChapterCompleted,
+      };
+      try {
+        const res: courseProgressResType = await updateChapterProgress(
+          inputData
+        ).unwrap();
+        if (res.apiMsg) {
+          setCourseProgressInfo(res.courseProgressInfo);
+          if (res.apiMsg === "Congrats...You've Completed this Course!!!") {
+            setShowConfetti(true);
+            setTimeout(() => {
+              navigate("/");
+            }, 10000);
+          } else if (res.apiMsg === '"Course Progress Updated"') {
+            toast.success(res.apiMsg, {
+              style: toastStyles.success,
+            });
+          }
+        }
+      } catch (error: any) {
+        toast.error(error.data.apiMsg, {
+          style: toastStyles.error,
+        });
+      }
+    }
   };
 
   const handleCourseUpdate = async () => {
     if (courseProgressInfo) {
       if (courseProgressInfo.isCourseBought) {
-        const status: boolean = courseProgressInfo.isCourseCompletd
-          ? false
-          : true;
+        try {
+          const status: boolean = courseProgressInfo.isCourseCompleted
+            ? false
+            : true;
 
-        const res: courseProgressResType = await updateCourseProgess({
-          courseProgressId: progresscode,
-          status,
-        }).unwrap();
-        console.log(res);
+          const res: courseProgressResType = await updateCourseProgess({
+            courseProgressId: progresscode,
+            status,
+          }).unwrap();
 
-        if (res.courseProgressInfo) {
-          const updatedInfo: courseProgressResType =
-            await fetchCourseProgressInfo({ progresscode }).unwrap();
-          if (updatedInfo.courseProgressInfo) {
-            setCourseProgressInfo(courseProgressInfo);
+          if (res.courseProgressInfo) {
+            setCourseProgressInfo(res.courseProgressInfo);
             if (status) {
               setShowConfetti(true);
               setTimeout(() => {
@@ -85,12 +144,10 @@ const CourseProgress = () => {
             } else {
               setCurrChapterIdx(0);
             }
+            toast.success(res.apiMsg, {
+              style: toastStyles.success,
+            });
           }
-          toast.success(res.apiMsg, {
-            style: toastStyles.success,
-          });
-        }
-        try {
         } catch (error: any) {
           toast.error(error.data.apiMsg, {
             style: toastStyles.error,
@@ -114,6 +171,46 @@ const CourseProgress = () => {
           toast.error(error.data.apiMsg, {
             style: toastStyles.error,
           });
+        }
+      }
+    }
+  };
+
+  const handleNextVideo = async () => {
+    if (courseProgressInfo && courseProgressInfo.chapters) {
+      const progressInfo: string[] = courseProgressInfo.chapters
+        .filter((data) => data.isChapterCompleted === true)
+        .map((data) => data.chapterTitle);
+      const isNowCompleted =
+        progressInfo.length >= courseProgressInfo.chapters.length - 1
+          ? true
+          : false;
+      const inputData = {
+        courseProgressId: progresscode,
+        idx: currChapterIdx,
+        isCourseCompleted: isNowCompleted,
+      };
+      const res: courseProgressResType = await updateVideoProgess(
+        inputData
+      ).unwrap();
+      if (res.courseProgressInfo) {
+        setCourseProgressInfo(res.courseProgressInfo);
+        // setCurrChapterIdx(res.courseProgressInfo.currChapterIdx);
+        toast.success(res.apiMsg, {
+          style: toastStyles.success,
+        });
+        if (currChapterIdx === courseProgressInfo.chapters.length - 1) {
+          setCurrChapterIdx(0);
+          setIsPlaying(false);
+        } else {
+          setCurrChapterIdx((prevData) => prevData + 1);
+          setIsPlaying(true);
+        }
+        if (isNowCompleted) {
+          setShowConfetti(true);
+          setTimeout(() => {
+            navigate("/");
+          }, 10000);
         }
       }
     }
@@ -155,10 +252,10 @@ const CourseProgress = () => {
           <div className="w-full h-full md:divCenter">
             {courseProgressInfo ? (
               <ChapterList
-                progresscode={progresscode}
-                freeChapterIdx={courseProgressInfo.freeChapterIdx}
-                isCourseBought={courseProgressInfo.isCourseBought}
+                courseProgressInfo={courseProgressInfo}
+                isChapterUpdateLoading={isChapterUpdateLoading}
                 handleChapterChange={handleChapterChange}
+                handleUpdateChapterProgress={handleUpdateChapterProgress}
               />
             ) : (
               <></>
@@ -172,6 +269,8 @@ const CourseProgress = () => {
                 width={900}
                 height={450}
                 className="w-full h-full"
+                onEnded={handleNextVideo}
+                playing={isPlaying}
                 url={courseProgressInfo.chapters[currChapterIdx].chapterVidURL}
                 controls
               />
@@ -182,7 +281,7 @@ const CourseProgress = () => {
                   {courseProgressInfo.name}
                 </h1>
                 <div className="divCenter gap-4">
-                  {courseProgressInfo.isCourseCompletd ? (
+                  {courseProgressInfo.isCourseCompleted ? (
                     <div className="bg-green-100 divCenter px-2 h-full text-center text-lg rounded-lg">
                       <CircleCheckBig className="mr-2" />
                       Course Completed
@@ -200,7 +299,7 @@ const CourseProgress = () => {
                           Enroll for : <IndianRupee />{" "}
                           {courseProgressInfo.price}
                         </>
-                      ) : courseProgressInfo.isCourseCompletd ? (
+                      ) : courseProgressInfo.isCourseCompleted ? (
                         "Reset Course Progress"
                       ) : (
                         "Mark Course as Complete"

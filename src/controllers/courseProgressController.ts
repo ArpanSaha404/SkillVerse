@@ -51,31 +51,6 @@ export const getCourseProgress = async (
   }
 };
 
-export const getChapterProgress = async (
-  req: Request,
-  res: Response
-): Promise<void> => {
-  const { progresscode } = req.query;
-  try {
-    const chapterProgressInfo = await courseProgress
-      .findById(progresscode)
-      .select("chapters -_id");
-    if (!chapterProgressInfo) {
-      res.status(400).json({
-        apiMsg: "No Relevant Data Found",
-      });
-    } else {
-      res.status(200).json({
-        apiMsg: "Chpater Data Fetched Successfully",
-        chapterProgressInfo: chapterProgressInfo.chapters,
-      });
-    }
-  } catch (error: any) {
-    console.error(error);
-    res.status(400).json({ apiMsg: "Some Error", errorMsg: error.message });
-  }
-};
-
 export const updateChapterProgress = async (
   req: Request,
   res: Response
@@ -95,9 +70,21 @@ export const updateChapterProgress = async (
       } else {
         courseProgressInfo.chapters[idx].isChapterCompleted = false;
       }
+
+      const isCourseCompleted: boolean =
+        courseProgressInfo.isCourseCompleted ||
+        courseProgressInfo.chapters
+          .map((data) => data.isChapterCompleted)
+          .every((value) => value === true);
+
+      const msg: string = isCourseCompleted
+        ? "Congrats...You've Completed this Course!!!"
+        : "Course Progress Updated";
+
       await courseProgressInfo.save();
       res.status(200).json({
-        apiMsg: "Course Progress Updated Successfully",
+        apiMsg: msg,
+        courseProgressInfo,
       });
     }
   } catch (error: any) {
@@ -113,8 +100,9 @@ export const updateCourseProgressCompleted = async (
   const { courseProgressId, status } = req.body;
 
   try {
-    const courseProgressInfo: ICourseProgress | null =
-      await courseProgress.findById(courseProgressId);
+    const courseProgressInfo: ICourseProgress | null = await courseProgress
+      .findById(courseProgressId)
+      .select("-createdAt -updatedAt -__v");
 
     if (!courseProgressInfo) {
       res.status(400).json({ apiMsg: "No Course Progress Data Found" });
@@ -122,11 +110,80 @@ export const updateCourseProgressCompleted = async (
       courseProgressInfo.chapters.map(
         (data) => (data.isChapterCompleted = status)
       );
-      courseProgressInfo.isCourseCompletd = status;
+      courseProgressInfo.isCourseCompleted = status;
 
       await courseProgressInfo.save();
       res.status(200).json({
         apiMsg: "Course Progress Updated Successfully",
+        courseProgressInfo,
+      });
+    }
+  } catch (error: any) {
+    console.error(error);
+    res.status(400).json({ apiMsg: "Some Error", errorMsg: error.message });
+  }
+};
+
+export const updateProgressVideo = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { courseProgressId, idx, isCourseCompleted } = req.body;
+  try {
+    const courseProgressInfo: ICourseProgress | null = await courseProgress
+      .findById(courseProgressId)
+      .select("-createdAt -updatedAt -__v");
+    if (!courseProgressInfo) {
+      res.status(400).json({ apiMsg: "No Course Progress Data Found" });
+    } else {
+      if (isCourseCompleted) {
+        courseProgressInfo.chapters.map(
+          (data) => (data.isChapterCompleted = true)
+        );
+        courseProgressInfo.isCourseCompleted = true;
+        courseProgressInfo.currChapterIdx = 0;
+      } else {
+        courseProgressInfo.chapters[idx].isChapterCompleted = true;
+        if (idx === courseProgressInfo.chapters.length - 1) {
+          courseProgressInfo.currChapterIdx = 0;
+        } else {
+          courseProgressInfo.currChapterIdx += 1;
+        }
+      }
+
+      const msg = isCourseCompleted
+        ? "Congrats...You've Completed this Course!!!"
+        : "Course Progress Updated";
+
+      await courseProgressInfo.save();
+      res.status(200).json({
+        apiMsg: msg,
+        courseProgressInfo,
+      });
+    }
+  } catch (error: any) {
+    console.error(error);
+    res.status(400).json({ apiMsg: "Some Error", errorMsg: error.message });
+  }
+};
+
+export const updateChangeVideoIdx = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { courseProgressId, idx } = req.body;
+  try {
+    const courseProgressInfo: ICourseProgress | null = await courseProgress
+      .findById(courseProgressId)
+      .select("-createdAt -updatedAt -__v");
+    if (!courseProgressInfo) {
+      res.status(400).json({ apiMsg: "No Course Progress Data Found" });
+    } else {
+      courseProgressInfo.currChapterIdx = idx;
+
+      await courseProgressInfo.save();
+      res.status(200).json({
+        apiMsg: "Current Video Idx upated Successfully",
         courseProgressInfo,
       });
     }
