@@ -116,7 +116,7 @@ router.post(
                 courseProgressInfo.name,
                 courseProgressInfo.price.toString(),
                 courseProgressInfo.paymentId,
-                `${process.env.FRONTEND_URL}/course-progress?progresscode=${courseProgressInfo._id}`
+                `${process.env.FRONTEND_URL_PROD}/course-progress?progresscode=${courseProgressInfo._id}`
               );
 
               res.status(200).json({

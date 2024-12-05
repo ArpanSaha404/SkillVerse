@@ -5,5 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const frontend_URL = `http://localhost:5000`;
-// `https://skillverse-z2r9.onrender.com`;
+export const frontend_URL = `https://skillverse-z2r9.onrender.com`;
+// `http://localhost:5000`;
+// ;

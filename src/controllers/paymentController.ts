@@ -109,8 +109,8 @@ export const checkoutSession = async (
               },
             ],
             mode: "payment",
-            success_url: `${process.env.FRONTEND_URL}/course-progress?progresscode=${newCourseProgress._id}`,
-            cancel_url: `${process.env.FRONTEND_URL}/courses`,
+            success_url: `${process.env.FRONTEND_URL_PROD}/course-progress?progresscode=${newCourseProgress._id}`,
+            cancel_url: `${process.env.FRONTEND_URL_PROD}/courses`,
             metadata: {
               newCourseId,
               newUserId,
