@@ -93,16 +93,20 @@ export const getUserPurchasedCourses = async (
   const { userid, coursesBought } = req.body;
 
   try {
-    const userCourseProgressList: ICourseProgress[] | null =
+    const userCourseProgressInfo: ICourseProgress[] | null =
       await courseProgress
         .find({
           $and: [{ userId: userid }, { courseId: { $in: coursesBought } }],
         })
         .select("-createdAt -updatedAt -__v");
 
-    if (!userCourseProgressList) {
+    if (!userCourseProgressInfo) {
       res.status(400).json({ apiMsg: "No Courses Purchased yet" });
     } else {
+      const userCourseProgressList = userCourseProgressInfo.filter((data) =>
+        data.chapters.filter((chapterData) => chapterData.isChapterCompleted)
+      );
+
       res.status(200).json({
         apiMsg: "bought Courses Details Fetched Successfully...",
         userCourseProgressList,

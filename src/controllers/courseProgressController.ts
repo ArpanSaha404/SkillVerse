@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
-import courseProgress, { ICourseProgress } from "../models/courseProgress";
+import courseProgress, {
+  chapterProgressType,
+  ICourseProgress,
+} from "../models/courseProgress";
 
 export const addCourseProgress = async (
   req: Request,
@@ -38,6 +41,10 @@ export const getCourseProgress = async (
           courseProgressInfo,
         });
       } else {
+        const chapterFilter: chapterProgressType[] =
+          courseProgressInfo.chapters.filter((data) => data.isChapterCompleted);
+        courseProgressInfo.chapters = chapterFilter;
+
         res.status(200).json({
           apiMsg:
             "Course not Bought...Data Fetched for free Chapter Successfully",
@@ -82,6 +89,11 @@ export const updateChapterProgress = async (
         : "Course Progress Updated";
 
       await courseProgressInfo.save();
+
+      const chapterFilter: chapterProgressType[] =
+        courseProgressInfo.chapters.filter((data) => data.isChapterCompleted);
+      courseProgressInfo.chapters = chapterFilter;
+
       res.status(200).json({
         apiMsg: msg,
         courseProgressInfo,
@@ -113,6 +125,11 @@ export const updateCourseProgressCompleted = async (
       courseProgressInfo.isCourseCompleted = status;
 
       await courseProgressInfo.save();
+
+      const chapterFilter: chapterProgressType[] =
+        courseProgressInfo.chapters.filter((data) => data.isChapterCompleted);
+      courseProgressInfo.chapters = chapterFilter;
+
       res.status(200).json({
         apiMsg: "Course Progress Updated Successfully",
         courseProgressInfo,
@@ -156,6 +173,11 @@ export const updateProgressVideo = async (
         : "Course Progress Updated";
 
       await courseProgressInfo.save();
+
+      const chapterFilter: chapterProgressType[] =
+        courseProgressInfo.chapters.filter((data) => data.isChapterCompleted);
+      courseProgressInfo.chapters = chapterFilter;
+
       res.status(200).json({
         apiMsg: msg,
         courseProgressInfo,
@@ -182,6 +204,11 @@ export const updateChangeVideoIdx = async (
       courseProgressInfo.currChapterIdx = idx;
 
       await courseProgressInfo.save();
+
+      const chapterFilter: chapterProgressType[] =
+        courseProgressInfo.chapters.filter((data) => data.isChapterCompleted);
+      courseProgressInfo.chapters = chapterFilter;
+
       res.status(200).json({
         apiMsg: "Current Video Idx upated Successfully",
         courseProgressInfo,
