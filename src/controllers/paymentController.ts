@@ -34,98 +34,108 @@ export const checkoutSession = async (
         });
       }
     } else {
-      const newPaymentEntry: IPayments = new payments({
-        paymentId: GenerateVerificationOTP(),
-        paymentStatus: "Pending",
-        courseName: courseInfo.name,
-        coursePrice: courseInfo.price,
-        createdBy: courseInfo.createdBy,
-        courseId: courseInfo._id,
-        userId: userInfo._id,
-        creatorId: courseInfo.creatorId,
-      });
-
-      const newPayment = await payments.create(newPaymentEntry);
-
-      const allChaptersInfo: chapterProgressType[] = courseInfo.chapters.map(
-        (data) => ({
-          chapterTitle: data.chapterTitle,
-          chapterDesc: data.chapterDesc,
-          chapterVidURL: data.chapterVidURL,
-          isChapterCompleted: false,
-        })
-      );
-
-      const newCourseProgressInfo: ICourseProgress = new courseProgress({
-        name: courseInfo.name,
-        desc: courseInfo.desc,
-        price: courseInfo.price,
-        freeChapterIdx: courseInfo.freeChapterIdx,
-        currChapterIdx: courseInfo.freeChapterIdx,
-        courseId: courseInfo._id,
-        userId: userInfo._id,
-        creatorId: courseInfo.creatorId,
-        paymentMongoId: newPayment._id,
-        paymentId: newPayment.paymentId,
-        isCourseBought: false,
-        isCourseCompletd: false,
-        chapters: allChaptersInfo,
-      });
-
-      const newCourseProgress: ICourseProgress = await courseProgress.create(
-        newCourseProgressInfo
-      );
-
-      const newCourseId: string = courseId.toString();
-      const newUserId: string = userId.toString();
-      const newPaymentId: string = newPayment._id.toString();
-      const newCourseProgressId: string = newCourseProgress._id.toString();
-      const img: string = courseInfo.coursePic;
-
-      const session: Stripe.Checkout.Session =
-        await stripe.checkout.sessions.create({
-          payment_method_types: ["card"],
-          line_items: [
-            {
-              price_data: {
-                currency: "inr",
-                product_data: {
-                  name: courseInfo.name,
-                  description:
-                    courseInfo.subTitle + " by " + courseInfo.createdBy,
-                  images: [img || "https://github.com/shadcn.png"],
-                },
-                unit_amount: courseInfo.price * 100,
-              },
-              quantity: 1,
-            },
-          ],
-          mode: "payment",
-          success_url: `${process.env.frontend_URL}/course-progress?progresscode=${newCourseProgress._id}`,
-          cancel_url: `${process.env.frontend_URL}/courses`,
-          metadata: {
-            newCourseId,
-            newUserId,
-            newCreatorId: courseInfo.creatorId.toString(),
-            newPaymentId,
-            newCourseProgressId,
-          },
-          shipping_address_collection: {
-            allowed_countries: ["IN"],
-          },
-        } as Stripe.Checkout.SessionCreateParams);
-
-      if (!session) {
-        res.status(400).json({ apiMsg: "Some Error While Creating Session" });
-      } else {
-        newPayment.paymentId = session.id;
-        await newPayment.save();
-
+      if (
+        userInfo.coursesBought.filter((data) => data === courseInfo._id)
+          .length >= 1
+      ) {
         res.status(200).json({
-          apiMsg: "Please Wait you'll be redirected to Payment Page Shortly...",
-          apiMsg2: "Session Created Successfully...",
-          url: session.url,
+          apiMsg: "Course Already Purchased",
         });
+      } else {
+        const newPaymentEntry: IPayments = new payments({
+          paymentId: GenerateVerificationOTP(),
+          paymentStatus: "Pending",
+          courseName: courseInfo.name,
+          coursePrice: courseInfo.price,
+          createdBy: courseInfo.createdBy,
+          courseId: courseInfo._id,
+          userId: userInfo._id,
+          creatorId: courseInfo.creatorId,
+        });
+
+        const newPayment = await payments.create(newPaymentEntry);
+
+        const allChaptersInfo: chapterProgressType[] = courseInfo.chapters.map(
+          (data) => ({
+            chapterTitle: data.chapterTitle,
+            chapterDesc: data.chapterDesc,
+            chapterVidURL: data.chapterVidURL,
+            isChapterCompleted: false,
+          })
+        );
+
+        const newCourseProgressInfo: ICourseProgress = new courseProgress({
+          name: courseInfo.name,
+          desc: courseInfo.desc,
+          price: courseInfo.price,
+          freeChapterIdx: courseInfo.freeChapterIdx,
+          currChapterIdx: courseInfo.freeChapterIdx,
+          courseId: courseInfo._id,
+          userId: userInfo._id,
+          creatorId: courseInfo.creatorId,
+          paymentMongoId: newPayment._id,
+          paymentId: newPayment.paymentId,
+          isCourseBought: false,
+          isCourseCompletd: false,
+          chapters: allChaptersInfo,
+        });
+
+        const newCourseProgress: ICourseProgress = await courseProgress.create(
+          newCourseProgressInfo
+        );
+
+        const newCourseId: string = courseId.toString();
+        const newUserId: string = userId.toString();
+        const newPaymentId: string = newPayment._id.toString();
+        const newCourseProgressId: string = newCourseProgress._id.toString();
+        const img: string = courseInfo.coursePic;
+
+        const session: Stripe.Checkout.Session =
+          await stripe.checkout.sessions.create({
+            payment_method_types: ["card"],
+            line_items: [
+              {
+                price_data: {
+                  currency: "inr",
+                  product_data: {
+                    name: courseInfo.name,
+                    description:
+                      courseInfo.subTitle + " by " + courseInfo.createdBy,
+                    images: [img || "https://github.com/shadcn.png"],
+                  },
+                  unit_amount: courseInfo.price * 100,
+                },
+                quantity: 1,
+              },
+            ],
+            mode: "payment",
+            success_url: `${process.env.FRONTEND_URL}/course-progress?progresscode=${newCourseProgress._id}`,
+            cancel_url: `${process.env.FRONTEND_URL}/courses`,
+            metadata: {
+              newCourseId,
+              newUserId,
+              newCreatorId: courseInfo.creatorId.toString(),
+              newPaymentId,
+              newCourseProgressId,
+            },
+            shipping_address_collection: {
+              allowed_countries: ["IN"],
+            },
+          } as Stripe.Checkout.SessionCreateParams);
+
+        if (!session) {
+          res.status(400).json({ apiMsg: "Some Error While Creating Session" });
+        } else {
+          newPayment.paymentId = session.id;
+          await newPayment.save();
+
+          res.status(200).json({
+            apiMsg:
+              "Please Wait you'll be redirected to Payment Page Shortly...",
+            apiMsg2: "Session Created Successfully...",
+            url: session.url,
+          });
+        }
       }
     }
   } catch (error: any) {

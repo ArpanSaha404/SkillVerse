@@ -65,6 +65,7 @@ export const courseProgressApi = createApi({
         method: "PATCH",
         body: inputData,
       }),
+      invalidatesTags: ["Refetch_Progress"],
     }),
   }),
 });

@@ -295,3 +295,68 @@ export const resetPasswordSuccessMailTemplate: string = `
   </body>
 </html>
 `;
+
+export const coursePurchasedMailTemplate = `
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .email-container {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        padding: 20px;
+        background-color: #f4f4f4;
+        border-radius: 10px;
+        max-width: 600px;
+        margin: auto;
+        border: 1px solid #352208;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+      }
+      .email-header {
+        background-color: #806443;
+        color: white;
+        padding: 10px;
+        text-align: center;
+        border-radius: 10px 10px 0 0;
+      }
+      .email-body {
+        padding: 20px;
+        background-color: white;
+        border-radius: 0 0 10px 10px;
+      }
+      .email-footer {
+        text-align: center;
+        padding: 10px;
+        font-size: 12px;
+        color: #777;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="email-container">
+      <div class="email-header">
+        <h1>SkillVerse Course Details</h1>
+      </div>
+      <div class="email-body">
+        <p>Hi {name},</p>
+        <p>Congratulations! Course Purchased.</p>
+        <p>
+          You've Successfully Purchased the Course : {courseName} for ₹{price}<br />
+          Your Payment ID : {paymentId} <br />
+          You can use below given URL to go to your Course : <br />
+          {courseprogressURL}
+        </p>
+        <p>
+          If you have any questions or need assistance, feel free to reach out
+          to us.
+        </p>
+        <p>Best Regards,<br />The SkillVerse Team</p>
+      </div>
+      <div class="email-footer">
+        <p>&copy; 2024 SkillVerse . All rights reserved.</p>
+      </div>
+    </div>
+  </body>
+</html>
+`;

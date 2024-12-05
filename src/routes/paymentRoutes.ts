@@ -5,6 +5,7 @@ import payments, { IPayments } from "../models/payments";
 import users, { Iuser } from "../models/users";
 import courses, { ICourses } from "../models/courses";
 import courseProgress, { ICourseProgress } from "../models/courseProgress";
+import { coursePurchasedMail } from "../utils/mailtrap,";
 
 const router = express.Router();
 
@@ -107,6 +108,15 @@ router.post(
 
               paymentInfo.paymentStatus = "Success";
               await paymentInfo.save();
+
+              await coursePurchasedMail(
+                userInfo.email,
+                userInfo.fullName,
+                courseProgressInfo.name,
+                courseProgressInfo.price.toString(),
+                courseProgressInfo.paymentId,
+                `${process.env.FRONTEND_URL}/course-progress?progresscode=${courseProgressInfo._id}`
+              );
 
               res.status(200).json({
                 apiMsg: "Stripe Payment Success",

@@ -5,6 +5,10 @@ import {
   singleCoursesType,
 } from "../../types/courses";
 import { frontend_URL } from "../../components/lib/utils";
+import {
+  userCouseProgressListInputs,
+  userCouseProgressListResponse,
+} from "../../types/courseProgress";
 
 export const courseApi = createApi({
   reducerPath: "courseApi",
@@ -22,6 +26,16 @@ export const courseApi = createApi({
     getCreatorInfo: builder.query<creatorPic, string>({
       query: (creatorId) => `/course-details/creator?creatorId=${creatorId}`,
     }),
+    getUserCourseProgressInfo: builder.mutation<
+      userCouseProgressListResponse,
+      userCouseProgressListInputs
+    >({
+      query: (inputData) => ({
+        url: "/user-purchased",
+        method: "POST",
+        body: inputData,
+      }),
+    }),
   }),
 });
 
@@ -29,4 +43,5 @@ export const {
   useAllCourseDataQuery,
   useLazyGetSingleCourseDataQuery,
   useLazyGetCreatorInfoQuery,
+  useGetUserCourseProgressInfoMutation,
 } = courseApi;

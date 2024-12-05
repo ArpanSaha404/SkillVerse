@@ -2,6 +2,7 @@ import express from "express";
 import {
   addCourse,
   getCreatorDetails,
+  getUserPurchasedCourses,
   viewAllCourses,
   viewSingleCourse,
 } from "../controllers/courseController";
@@ -13,5 +14,6 @@ router.post("/course", isAuthenticated, addCourse);
 router.get("/course", isAuthenticated, viewAllCourses);
 router.get("/course-details/:id", isAuthenticated, viewSingleCourse);
 router.get("/course-details/creator", isAuthenticated, getCreatorDetails);
+router.post("/user-purchased", getUserPurchasedCourses);
 
 export default router;

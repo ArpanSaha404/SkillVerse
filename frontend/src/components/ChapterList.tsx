@@ -1,4 +1,6 @@
 import {
+  CircleCheck,
+  Eye,
   Loader2,
   LockKeyhole,
   LockKeyholeOpen,
@@ -25,6 +27,7 @@ import { toastStyles } from "./toastStyles";
 
 interface chaptersListProps {
   courseProgressInfo: courseProgressType;
+  currChapterIdx: number;
   isChapterUpdateLoading: boolean;
   handleChapterChange: (idx: number) => void;
   handleUpdateChapterProgress: (idx: number) => void;
@@ -35,11 +38,13 @@ interface mobileChaptersListProps {
   isChapterUpdateLoading: boolean;
   freeChapterIdx: number;
   isCourseBought: boolean;
+  currChapterIdx: number;
   handleUpdateChapterProgress: (idx: number) => void;
 }
 
 const ChapterList: React.FC<chaptersListProps> = ({
   courseProgressInfo,
+  currChapterIdx,
   isChapterUpdateLoading,
   handleChapterChange,
   handleUpdateChapterProgress,
@@ -78,6 +83,7 @@ const ChapterList: React.FC<chaptersListProps> = ({
               isChapterUpdateLoading={isChapterUpdateLoading}
               freeChapterIdx={courseProgressInfo.freeChapterIdx}
               isCourseBought={courseProgressInfo.isCourseBought}
+              currChapterIdx={currChapterIdx}
               handleUpdateChapterProgress={handleUpdateChapterProgress}
             />
           ) : (
@@ -92,19 +98,41 @@ const ChapterList: React.FC<chaptersListProps> = ({
                 (data: chapterProgressType, idx: number) => (
                   <div
                     key={idx}
-                    className="divCenter flex-col h-auto w-full rounded-lg border-2 border-brwn text-center text-xl hover:bg-gray-100"
+                    className="divCenter flex-col h-auto w-full rounded-lg border-2 text-center text-xl hover:bg-gray-100"
                     onClick={() => handleCourseAlert(idx)}
-                    style={{ backgroundColor: idx === isIdx ? "#f3f4f6" : "" }}
+                    style={{
+                      backgroundColor: idx === isIdx ? "#f3f4f6" : "",
+                      borderColor: courseProgressInfo.isCourseBought
+                        ? idx === currChapterIdx
+                          ? "#F59E0B"
+                          : data.isChapterCompleted
+                          ? "#22C55E"
+                          : "#2a0800"
+                        : "#2a0800",
+                    }}
                   >
                     <button
                       onClick={() => handleChapterBox(idx)}
-                      className="divCenter px-4 py-2 h-full w-full ext-brwn border-solid border-b-2 border-hvrBrwn shadow-none bg-white text-black hover:bg-gray-100"
+                      className="divCenter px-4 py-2 h-full w-full border-solid border-b-2 shadow-none bg-white text-black hover:bg-gray-100"
                       style={{
                         backgroundColor: idx === isIdx ? "#f3f4f6" : "",
+                        color: courseProgressInfo.isCourseBought
+                          ? idx === currChapterIdx
+                            ? "#F59E0B"
+                            : data.isChapterCompleted
+                            ? "#22C55E"
+                            : "#2a0800"
+                          : "#2a0800",
                       }}
                     >
                       {courseProgressInfo.isCourseBought ? (
-                        <LockKeyholeOpen className="mr-2" />
+                        idx === currChapterIdx ? (
+                          <Eye className="mr-2" />
+                        ) : data.isChapterCompleted ? (
+                          <CircleCheck className="mr-2" />
+                        ) : (
+                          <LockKeyholeOpen className="mr-2" />
+                        )
                       ) : idx === courseProgressInfo.freeChapterIdx ? (
                         <LockKeyholeOpen className="mr-2" />
                       ) : (
@@ -182,6 +210,7 @@ const MobileChapterList: React.FC<mobileChaptersListProps> = ({
   isChapterUpdateLoading,
   freeChapterIdx,
   isCourseBought,
+  currChapterIdx,
   handleUpdateChapterProgress,
 }) => {
   const [isIdx, setIsIdx] = useState<number>();
@@ -217,19 +246,41 @@ const MobileChapterList: React.FC<mobileChaptersListProps> = ({
                 (data: chapterProgressType, idx: number) => (
                   <div
                     key={idx}
-                    className="divCenter flex-col h-auto w-full rounded-lg border-2 border-brwn text-center text-xl hover:bg-gray-100"
-                    style={{ backgroundColor: idx === isIdx ? "#f3f4f6" : "" }}
+                    className="divCenter flex-col h-auto w-full rounded-lg border-2 text-center text-xl hover:bg-gray-100"
+                    style={{
+                      backgroundColor: idx === isIdx ? "#f3f4f6" : "",
+                      borderColor: courseProgressInfo.isCourseBought
+                        ? idx === currChapterIdx
+                          ? "#F59E0B"
+                          : data.isChapterCompleted
+                          ? "#22C55E"
+                          : "#2a0800"
+                        : "#2a0800",
+                    }}
                   >
                     <button
                       onClick={() => handleChapterBox(idx)}
-                      className="divCenter px-4 py-2 h-full w-full text-brwn border-solid border-b-2 border-hvrBrwn shadow-none bg-white text-black hover:bg-gray-100"
+                      className="divCenter px-4 py-2 h-full w-full border-solid border-b-2 shadow-none bg-white text-black hover:bg-gray-100"
                       style={{
                         backgroundColor: idx === isIdx ? "#f3f4f6" : "",
+                        color: courseProgressInfo.isCourseBought
+                          ? idx === currChapterIdx
+                            ? "#F59E0B"
+                            : data.isChapterCompleted
+                            ? "#22C55E"
+                            : "#2a0800"
+                          : "#2a0800",
                       }}
                     >
-                      {isCourseBought ? (
-                        <LockKeyholeOpen className="mr-2" />
-                      ) : idx === freeChapterIdx ? (
+                      {courseProgressInfo.isCourseBought ? (
+                        idx === currChapterIdx ? (
+                          <Eye className="mr-2" />
+                        ) : data.isChapterCompleted ? (
+                          <CircleCheck className="mr-2" />
+                        ) : (
+                          <LockKeyholeOpen className="mr-2" />
+                        )
+                      ) : idx === courseProgressInfo.freeChapterIdx ? (
                         <LockKeyholeOpen className="mr-2" />
                       ) : (
                         <LockKeyhole className="mr-2" />

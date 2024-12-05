@@ -6,11 +6,21 @@ import { courseType } from "../types/courses";
 import { Button } from "./ui/button";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAllCourseDataQuery } from "../features/api/courseApi";
+import {
+  useAllCourseDataQuery,
+  useGetUserCourseProgressInfoMutation,
+} from "../features/api/courseApi";
 import { useAppSelector } from "../app/hooks";
 import { useAllCategoriesDataQuery } from "../features/api/categoryApi";
 import { category } from "../types/courseCategories";
 import { Separator } from "./ui/separator";
+import {
+  courseProgressType,
+  userCouseProgressListInputs,
+  userCouseProgressListResponse,
+} from "../types/courseProgress";
+import { toast, Toaster } from "sonner";
+import { toastStyles } from "./toastStyles";
 
 const CoursesPage = () => {
   const { searchQuery } = useParams<{ searchQuery?: string }>();
@@ -20,16 +30,27 @@ const CoursesPage = () => {
 
   const { data: allCourse, isLoading } = useAllCourseDataQuery();
   const { data: allCategories } = useAllCategoriesDataQuery();
+  const [getUserCourseProgressInfo] = useGetUserCourseProgressInfoMutation();
 
   const [courseData, setCourseData] = useState<courseType[]>([]);
   const [courseDupData, setCourseDupData] = useState<courseType[]>([]);
   const [categoryData, setCategoryData] = useState<category[]>([]);
+  const [userProgressData, setUserProgressData] = useState<
+    courseProgressType[]
+  >([]);
+  const [userProgressPerc, setUserProgressPerc] = useState<
+    {
+      courseId: string;
+      perc: number;
+    }[]
+  >([]);
 
   const [checkedItems, setCheckedItems] = useState<boolean[]>([]);
 
   const navigate = useNavigate();
   const boughtCourses = useAppSelector((state) => state.auth.coursesBought);
   const createdCourses = useAppSelector((state) => state.auth.coursesCreated);
+  const userId = useAppSelector((state) => state.auth._id);
 
   useEffect(() => {
     //Course Data
@@ -59,7 +80,52 @@ const CoursesPage = () => {
         )
       );
     }
-  }, [allCourse, allCategories, categoryData.length, searchQuery]);
+
+    const progressInfo = async () => {
+      if (userId) {
+        try {
+          if (userId && boughtCourses.length > 0) {
+            const inputData: userCouseProgressListInputs = {
+              userid: userId,
+              coursesBought: boughtCourses,
+            };
+            const res: userCouseProgressListResponse =
+              await getUserCourseProgressInfo(inputData).unwrap();
+            if (res.userCourseProgressList) {
+              setUserProgressData(res.userCourseProgressList);
+
+              const progressArr: {
+                courseId: string;
+                perc: number;
+              }[] = res.userCourseProgressList.map((data) => ({
+                courseId: data.courseId,
+                perc:
+                  (data.chapters.filter(
+                    (chapterData) => chapterData.isChapterCompleted
+                  ).length /
+                    data.chapters.length) *
+                  100,
+              }));
+              setUserProgressPerc(progressArr);
+            }
+          }
+        } catch (error: any) {
+          toast.error(error.data.apiMsg, {
+            style: toastStyles.error,
+          });
+        }
+      }
+    };
+    progressInfo();
+  }, [
+    allCourse,
+    allCategories,
+    categoryData.length,
+    searchQuery,
+    boughtCourses,
+    getUserCourseProgressInfo,
+    userId,
+  ]);
 
   const changeInputHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
@@ -127,10 +193,24 @@ const CoursesPage = () => {
     }
   };
 
+  const progressNavigate = (courseid: string) => {
+    if (boughtCourses.includes(courseid) && userProgressData) {
+      const progresscode: string =
+        userProgressData.filter((data) => data.courseId === courseid)[0]._id ||
+        "";
+      if (progresscode) {
+        navigate(`/course-progress?progresscode=${progresscode}`);
+      } else {
+        navigate("/");
+      }
+    }
+  };
+
   return (
     <div>
       <div className="">
         <Navbar />
+        <Toaster />
         <div className="w-full">
           <div className="md:w-full w-auto divCenter my-4">
             <div className="gap-4 md:w-1/2 w-full flex divCenter">
@@ -204,11 +284,7 @@ const CoursesPage = () => {
                       className="h-40 w-full rounded-lg object-cover"
                       src={data.coursePic}
                       alt="Course_Pic"
-                      onClick={() => {
-                        if (boughtCourses.includes(data._id)) {
-                          navigate(`/course-progress`);
-                        }
-                      }}
+                      onClick={() => progressNavigate(data._id)}
                     />
                     <div className="flex flex-col items-start justify-start text-hvrBrwn space-y-2">
                       <h1 className="text-lg font-bold hover:underline mt-2">
@@ -228,10 +304,36 @@ const CoursesPage = () => {
                       </div>
                     </div>
                     {boughtCourses.includes(courseData[idx]._id) ? (
-                      <div className="w-full flex items-center justify-between">
-                        <div>{"Progress bar"}</div>
-                        <div>{"Percentage"}</div>
-                      </div>
+                      userProgressData && userProgressPerc.length > 0 ? (
+                        <div className="w-full divCenter mt-2">
+                          <div className="w-3/4 divCenter">
+                            <div
+                              style={{ minHeight: "10px" }}
+                              className="bg-green-200 divCenter max-h-3 w-full text-center text-lg rounded-lg overflow-hiden relative"
+                            >
+                              <div
+                                className="absolute top-0 left-0 h-full rounded-lg bg-green-500"
+                                style={{
+                                  width: `${
+                                    userProgressPerc.filter(
+                                      (percData) =>
+                                        percData.courseId === data._id
+                                    )[0].perc || 1
+                                  }%`,
+                                }}
+                              ></div>
+                            </div>
+                          </div>
+                          <div className="w-1/4 divCenter">
+                            {userProgressPerc.filter(
+                              (percData) => percData.courseId === data._id
+                            )[0].perc || 0}
+                            %
+                          </div>
+                        </div>
+                      ) : (
+                        <></>
+                      )
                     ) : createdCourses.includes(courseData[idx]._id) ? (
                       <div className="w-full text-lg font-semibold flex items-center justify-between">
                         <div className="divCenter">Course Created by You</div>

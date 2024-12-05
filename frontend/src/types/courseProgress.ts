@@ -44,3 +44,13 @@ export type updateChapterProgress = {
   idx: number;
   status: boolean;
 };
+
+export type userCouseProgressListInputs = {
+  userid: string;
+  coursesBought: string[];
+};
+
+export type userCouseProgressListResponse = {
+  apiMsg: string;
+  userCourseProgressList: courseProgressType[];
+};

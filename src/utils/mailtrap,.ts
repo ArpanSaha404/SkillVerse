@@ -3,6 +3,7 @@ const nodemailer = require("nodemailer");
 const { MailtrapTransport } = require("mailtrap");
 import dotenv from "dotenv";
 import {
+  coursePurchasedMailTemplate,
   resetPasswordMailTemplate,
   resetPasswordSuccessMailTemplate,
   verifyAccountMailTemplate,
@@ -89,6 +90,38 @@ export const resetPasswordSuccessMail = async (email: string) => {
       to: recipients,
       subject: "Your Skillverse Password reset Successfully",
       html: resetPasswordSuccessMailTemplate,
+      category: "Email Verification",
+    })
+    .then(console.log, console.error);
+  try {
+  } catch (error) {
+    console.log(error);
+    throw new Error("Failed to Send Desired Mail...");
+  }
+};
+
+export const coursePurchasedMail = async (
+  email: string,
+  name: string,
+  courseName: string,
+  price: string,
+  paymentId: string,
+  courseURL: string
+) => {
+  let updatedHTML: string = coursePurchasedMailTemplate;
+  updatedHTML = updatedHTML.replace("{name}", name);
+  updatedHTML = updatedHTML.replace("{courseName}", courseName);
+  updatedHTML = updatedHTML.replace("{price}", price);
+  updatedHTML = updatedHTML.replace("{paymentId}", paymentId);
+  updatedHTML = updatedHTML.replace("{courseprogressURL}", courseURL);
+
+  const recipients = [{ email }];
+  await client
+    .send({
+      from: sender,
+      to: recipients,
+      subject: "Skillverse: Course Purchased",
+      html: updatedHTML,
       category: "Email Verification",
     })
     .then(console.log, console.error);
