@@ -7,14 +7,15 @@ import {
   updateCourseProgressCompleted,
   updateProgressVideo,
 } from "../controllers/courseProgressController";
+import { isAuthenticated } from "../middlewares/isAuthenticated";
 
 const router = express.Router();
 
-router.post("/course-progress", addCourseProgress);
-router.get("/course-progress", getCourseProgress);
-router.patch("/chapter-update", updateChapterProgress);
-router.patch("/course-update", updateCourseProgressCompleted);
-router.patch("/progress-update", updateProgressVideo);
-router.patch("/currvideo-update", updateChangeVideoIdx);
+router.post("/course-progress", isAuthenticated, addCourseProgress);
+router.get("/course-progress", isAuthenticated, getCourseProgress);
+router.patch("/chapter-update", isAuthenticated, updateChapterProgress);
+router.patch("/course-update", isAuthenticated, updateCourseProgressCompleted);
+router.patch("/progress-update", isAuthenticated, updateProgressVideo);
+router.patch("/currvideo-update", isAuthenticated, updateChangeVideoIdx);
 
 export default router;

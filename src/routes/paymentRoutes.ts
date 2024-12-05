@@ -6,6 +6,7 @@ import users, { Iuser } from "../models/users";
 import courses, { ICourses } from "../models/courses";
 import courseProgress, { ICourseProgress } from "../models/courseProgress";
 import { coursePurchasedMail } from "../utils/mailtrap,";
+import { isAuthenticated } from "../middlewares/isAuthenticated";
 
 const router = express.Router();
 
@@ -14,9 +15,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   typescript: true,
 });
 
-router.post("/payment", checkoutSession);
+router.post("/payment", isAuthenticated, checkoutSession);
 router.post(
   "/webhook",
+  isAuthenticated,
   express.raw({ type: "application/json" }),
   async (req: Request, res: Response): Promise<void> => {
     let event = req.body;

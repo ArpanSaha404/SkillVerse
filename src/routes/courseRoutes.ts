@@ -14,6 +14,6 @@ router.post("/course", isAuthenticated, addCourse);
 router.get("/course", isAuthenticated, viewAllCourses);
 router.get("/course-details/:id", isAuthenticated, viewSingleCourse);
 router.get("/course-details/creator", isAuthenticated, getCreatorDetails);
-router.post("/user-purchased", getUserPurchasedCourses);
+router.post("/user-purchased", isAuthenticated, getUserPurchasedCourses);
 
 export default router;

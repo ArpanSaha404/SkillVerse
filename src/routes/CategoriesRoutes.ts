@@ -3,10 +3,11 @@ import {
   addCategory,
   viewallCategory,
 } from "../controllers/categoriesController";
+import { isAuthenticated } from "../middlewares/isAuthenticated";
 
 const router = express.Router();
 
-router.post("/category", addCategory);
-router.get("/category", viewallCategory);
+router.post("/category", isAuthenticated, addCategory);
+router.get("/category", isAuthenticated, viewallCategory);
 
 export default router;
