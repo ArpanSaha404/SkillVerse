@@ -18,7 +18,6 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 router.post("/payment", isAuthenticated, checkoutSession);
 router.post(
   "/webhook",
-  isAuthenticated,
   express.raw({ type: "application/json" }),
   async (req: Request, res: Response): Promise<void> => {
     let event = req.body;
