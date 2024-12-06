@@ -5,6 +5,7 @@ export interface Iuser extends Document {
   fullName: string;
   email: string;
   pic: string;
+  publicId: string;
   password: string;
   userType: string;
   isVerified: boolean;
@@ -30,6 +31,10 @@ const UserSchema = new mongoose.Schema<Iuser>(
       required: true,
     },
     pic: {
+      type: String,
+      default: "",
+    },
+    publicId: {
       type: String,
       default: "",
     },

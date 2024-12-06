@@ -16,6 +16,7 @@ export interface ICourses extends Document {
   subTitle: string;
   desc: string;
   coursePic: string;
+  coursePicPublicId: string;
   categories: string;
   price: number;
   freeChapterIdx: number;
@@ -50,6 +51,10 @@ const Courses = new mongoose.Schema<ICourses>(
       required: true,
     },
     coursePic: {
+      type: String,
+      default: "",
+    },
+    coursePicPublicId: {
       type: String,
       default: "",
     },

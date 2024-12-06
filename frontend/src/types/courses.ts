@@ -15,6 +15,7 @@ export type courseType = {
   subTitle: string;
   desc: string;
   coursePic: string;
+  coursePicPublicId: string;
   categories: string;
   price: number;
   freeChapterIdx: number;

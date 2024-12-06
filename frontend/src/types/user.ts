@@ -15,6 +15,7 @@ export type loginUserType = {
     email: string;
     password?: string;
     pic: string;
+    publicId: string;
     userType: string;
     isVerified: boolean;
     isAdmin: boolean;
