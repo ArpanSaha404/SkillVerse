@@ -203,6 +203,8 @@ const CoursesPage = () => {
       } else {
         navigate("/");
       }
+    } else {
+      return;
     }
   };
 

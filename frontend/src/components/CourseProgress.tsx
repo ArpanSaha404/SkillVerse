@@ -77,6 +77,7 @@ const CourseProgress = () => {
             res.courseProgressInfo.chapters.length) *
             100
         );
+        console.log(res.courseProgressInfo);
       }
     };
     fetchCourseProgressData();

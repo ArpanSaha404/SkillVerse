@@ -55,14 +55,14 @@ export const checkoutSession = async (
 
         const newPayment = await payments.create(newPaymentEntry);
 
-        const allChaptersInfo: chapterProgressType[] = courseInfo.chapters.map(
-          (data) => ({
+        const allChaptersInfo: chapterProgressType[] = courseInfo.chapters
+          .filter((data) => data.isChapterPublished)
+          .map((data) => ({
             chapterTitle: data.chapterTitle,
             chapterDesc: data.chapterDesc,
             chapterVidURL: data.chapterVidURL,
             isChapterCompleted: false,
-          })
-        );
+          }));
 
         const newCourseProgressInfo: ICourseProgress = new courseProgress({
           name: courseInfo.name,

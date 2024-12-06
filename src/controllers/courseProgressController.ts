@@ -41,10 +41,6 @@ export const getCourseProgress = async (
           courseProgressInfo,
         });
       } else {
-        const chapterFilter: chapterProgressType[] =
-          courseProgressInfo.chapters.filter((data) => data.isChapterCompleted);
-        courseProgressInfo.chapters = chapterFilter;
-
         res.status(200).json({
           apiMsg:
             "Course not Bought...Data Fetched for free Chapter Successfully",
@@ -90,10 +86,6 @@ export const updateChapterProgress = async (
 
       await courseProgressInfo.save();
 
-      const chapterFilter: chapterProgressType[] =
-        courseProgressInfo.chapters.filter((data) => data.isChapterCompleted);
-      courseProgressInfo.chapters = chapterFilter;
-
       res.status(200).json({
         apiMsg: msg,
         courseProgressInfo,
@@ -125,10 +117,6 @@ export const updateCourseProgressCompleted = async (
       courseProgressInfo.isCourseCompleted = status;
 
       await courseProgressInfo.save();
-
-      const chapterFilter: chapterProgressType[] =
-        courseProgressInfo.chapters.filter((data) => data.isChapterCompleted);
-      courseProgressInfo.chapters = chapterFilter;
 
       res.status(200).json({
         apiMsg: "Course Progress Updated Successfully",
@@ -174,10 +162,6 @@ export const updateProgressVideo = async (
 
       await courseProgressInfo.save();
 
-      const chapterFilter: chapterProgressType[] =
-        courseProgressInfo.chapters.filter((data) => data.isChapterCompleted);
-      courseProgressInfo.chapters = chapterFilter;
-
       res.status(200).json({
         apiMsg: msg,
         courseProgressInfo,
@@ -204,10 +188,6 @@ export const updateChangeVideoIdx = async (
       courseProgressInfo.currChapterIdx = idx;
 
       await courseProgressInfo.save();
-
-      const chapterFilter: chapterProgressType[] =
-        courseProgressInfo.chapters.filter((data) => data.isChapterCompleted);
-      courseProgressInfo.chapters = chapterFilter;
 
       res.status(200).json({
         apiMsg: "Current Video Idx upated Successfully",
