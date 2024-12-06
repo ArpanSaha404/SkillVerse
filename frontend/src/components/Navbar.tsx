@@ -103,7 +103,7 @@ const Navbar = () => {
                 <MenubarTrigger>Profile & Courses</MenubarTrigger>
                 <MenubarContent>
                   <MenubarItem className="text-hvrBrwn text-md hover:underline hover:hdrBrwn">
-                    <Link to="/">Update Profile</Link>
+                    <Link to="/">My Profile</Link>
                   </MenubarItem>
                   <MenubarItem className="text-hvrBrwn text-md hover:underline hover:hdrBrwn">
                     <Link to="/">
@@ -276,7 +276,7 @@ const MobileNavbar = () => {
               {isLoggedIn ? (
                 <div className="flex items-center flex-col justify-start space-y-4">
                   <Link to="/" className="w-full hover:underline">
-                    Update Profile
+                    My Profile
                   </Link>
                   <Link to="/courses" className="w-full hover:underline">
                     Explore All Courses
