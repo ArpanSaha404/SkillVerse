@@ -23,7 +23,6 @@ export const viewAllCourses = async (
   res: Response
 ): Promise<void> => {
   try {
-    console.log("hello");
     const courseData: ICourses[] | null = await Course.find({
       isPublished: true,
     })

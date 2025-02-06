@@ -15,7 +15,6 @@ export type loginUserType = {
     email: string;
     password?: string;
     pic: string;
-    publicId: string;
     userType: string;
     isVerified: boolean;
     isAdmin: boolean;
@@ -36,18 +35,16 @@ export type verifyAccountInputType = {
   otp: string;
 };
 
-// export type verifyAccountType = {
-//   apiMsg: string;
-//   userDetails: {
-//     _id: string;
-//     fullName: string;
-//     email: string;
-//     pic: string;
-//     userType: string;
-//     isVerified: boolean;
-//     isAdmin: boolean;
-//     coursesBought: string[];
-//     coursesCreated: string[];
-//     updatedAt: Date;
-//   };
-// };
+export type changePassDltAccType = {
+  password: string;
+  newPassword: string;
+  confirmNewPassword: string;
+  text: string;
+  email: string;
+  type: string;
+};
+
+export type updateProfilePicType = {
+  apiMsg: string;
+  pic?: string;
+};

@@ -1,8 +1,7 @@
 import { Request, Response } from "express";
-import courseProgress, {
-  chapterProgressType,
-  ICourseProgress,
-} from "../models/courseProgress";
+import courseProgress, { ICourseProgress } from "../models/courseProgress";
+import mongoose from "mongoose";
+import courses, { ICourses } from "../models/courses";
 
 export const addCourseProgress = async (
   req: Request,
@@ -192,6 +191,31 @@ export const updateChangeVideoIdx = async (
       res.status(200).json({
         apiMsg: "Current Video Idx upated Successfully",
         courseProgressInfo,
+      });
+    }
+  } catch (error: any) {
+    console.error(error);
+    res.status(400).json({ apiMsg: "Some Error", errorMsg: error.message });
+  }
+};
+
+export const purchasedCoursesbyUserId = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const userId = new mongoose.Types.ObjectId(req.query.userId as string);
+
+  try {
+    const coursesList: ICourseProgress[] | null = await courseProgress
+      .find({ userId: userId, isCourseBought: true })
+      .select("_id name isCourseCompleted chapters")
+      .populate("courseId", "-_id createdBy coursePic");
+    if (!coursesList) {
+      res.status(200).json({ apiMsg: "No Course Purchased" });
+    } else {
+      res.status(200).json({
+        apiMsg: "Purchased Courses Data Fetched Successfully",
+        coursesList,
       });
     }
   } catch (error: any) {

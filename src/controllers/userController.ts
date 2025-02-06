@@ -13,10 +13,12 @@ import {
 } from "../utils/mailtrap,";
 import {
   deleteImageFromCloudinary,
+  uploadImageToCloudinary,
   uploadMediaToCloudinary,
 } from "../utils/cloudinary";
 import { UploadApiErrorResponse, UploadApiResponse } from "cloudinary";
 import { deleteTempFile } from "../utils/multer";
+import courseProgress from "../models/courseProgress";
 
 export const checkAuth = async (req: Request, res: Response): Promise<void> => {
   try {
@@ -338,6 +340,131 @@ export const resetPassword = async (
     res.status(200).json({
       apiMsg: "Password Reset Successfully",
     });
+  } catch (error: any) {
+    console.log(error);
+    res.status(400).json({ apiMsg: "Some Error", errorMsg: error.message });
+  }
+};
+
+export const changePassDltAcc = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { password, newPassword, confirmNewPassword, text, email, type } =
+    req.body;
+
+  try {
+    if (type === "changePass") {
+      if (newPassword === confirmNewPassword) {
+        const userDetails: Iuser | null = await users
+          .findOne({ email })
+          .select("-createdAt -updatedAt -__v");
+
+        if (!userDetails || !userDetails.password) {
+          res
+            .status(400)
+            .json({ apiMsg: "User dosen't Exist!!! Please Sign Up First" });
+        } else {
+          const isPasswordCorrect = await bcrypt.compare(
+            password,
+            userDetails.password
+          );
+          if (!isPasswordCorrect) {
+            res.status(400).json({ apiMsg: "Wrong Password!!!" });
+          } else {
+            const hashPassword = await bcrypt.hash(newPassword, 10);
+            userDetails.password = hashPassword;
+            await userDetails.save();
+            res.status(200).json({
+              apiMsg: "Password Changed Successfully",
+            });
+          }
+        }
+      } else {
+        res.status(400).json({ apiMsg: "New Passwords don't Match" });
+      }
+    } else if (type === "dltAcc") {
+      if (text === "delete my account") {
+        const userDetails: Iuser | null = await users
+          .findOne({ email })
+          .select("-createdAt -updatedAt -__v");
+
+        if (!userDetails || !userDetails.password) {
+          res
+            .status(400)
+            .json({ apiMsg: "User dosen't Exist!!! Please Sign Up First" });
+        } else {
+          const isPasswordCorrect = await bcrypt.compare(
+            password,
+            userDetails.password
+          );
+          if (!isPasswordCorrect) {
+            res.status(400).json({ apiMsg: "Wrong Password!!!" });
+          } else {
+            await users.deleteOne({ id: userDetails._id });
+            await courseProgress.deleteMany({
+              userId: userDetails._id,
+            });
+
+            res.clearCookie("token").status(200).json({
+              apiMsg: "Account Deleted Successfully",
+            });
+          }
+        }
+      } else {
+        res.status(400).json({ apiMsg: `Text should be "delete my account"` });
+      }
+    } else {
+      res.status(400).json({ apiMsg: "Some Error" });
+    }
+  } catch (error: any) {
+    console.log(error);
+    res.status(400).json({ apiMsg: "Some Error", errorMsg: error.message });
+  }
+};
+
+export const updateProfileImage = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const file = req.file as Express.Multer.File;
+  const { _id } = req.body;
+
+  try {
+    if (file && file.path) {
+      const userInfo: Iuser | null = await users.findById(_id);
+
+      if (userInfo) {
+        if (userInfo.pic) {
+          const publicId: string | undefined = userInfo.pic
+            .split("/")
+            .pop()
+            ?.split(".")[0];
+          if (publicId) {
+            await deleteImageFromCloudinary(publicId);
+          }
+        }
+
+        const url: UploadApiResponse | undefined =
+          await uploadImageToCloudinary(file.path);
+        if (url && url.secure_url) {
+          userInfo.pic = url.secure_url;
+          userInfo.save();
+          res.status(200).json({
+            apiMsg: "Profile Pic Updated Successfully",
+            pic: url.secure_url,
+          });
+        } else {
+          res
+            .status(400)
+            .json({ apiMsg: "Error while Uploading to cloudinary" });
+        }
+      } else {
+        res.status(400).json({ apiMsg: "No such User Found" });
+      }
+    } else {
+      res.status(400).json({ apiMsg: "Corrupted File Path" });
+    }
   } catch (error: any) {
     console.log(error);
     res.status(400).json({ apiMsg: "Some Error", errorMsg: error.message });

@@ -19,6 +19,32 @@ export const uploadMediaToCloudinary = async (filePath: string) => {
   }
 };
 
+export const uploadImageToCloudinary = async (filePath: string) => {
+  try {
+    const uploadResponse = await cloudinary.uploader.upload(filePath, {
+      resource_type: "image",
+    });
+    console.log(uploadResponse);
+
+    return uploadResponse;
+  } catch (error: any) {
+    console.error(error);
+  }
+};
+
+export const uploadVideoToCloudinary = async (filePath: string) => {
+  try {
+    const uploadResponse = await cloudinary.uploader.upload(filePath, {
+      resource_type: "video",
+    });
+    console.log(uploadResponse);
+
+    return uploadResponse;
+  } catch (error: any) {
+    console.error(error);
+  }
+};
+
 export const deleteImageFromCloudinary = async (publicId: string) => {
   try {
     await cloudinary.uploader.destroy(publicId, { resource_type: "image" });

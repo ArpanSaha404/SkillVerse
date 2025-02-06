@@ -10,6 +10,8 @@ import CourseProgress from "./components/CourseProgress";
 import Loading from "./components/Loading";
 import ProtectedRoutes from "./components/ProtectedRoutes";
 import UpdateProfile from "./components/UpdateProfile";
+import MyProfile from "./components/MyProfile";
+import MyCourses from "./components/MyCourses";
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/verify-account" element={<Verifyaccount />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/my-profile" element={<MyProfile />} />
+          <Route path="/my-courses" element={<MyCourses />} />
           <Route
             path="/courses"
             element={

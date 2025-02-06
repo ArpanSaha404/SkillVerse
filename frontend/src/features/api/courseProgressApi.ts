@@ -1,6 +1,7 @@
 import {
   courseProgressResType,
   updateChapterProgress,
+  userPurchasedCoursesResponse,
 } from "../../types/courseProgress";
 import { frontend_URL } from "../../components/lib/utils";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
@@ -67,6 +68,15 @@ export const courseProgressApi = createApi({
       }),
       invalidatesTags: ["Refetch_Progress"],
     }),
+    getPurchasedCoursesByUserId: builder.query<
+      userPurchasedCoursesResponse,
+      { userId: string }
+    >({
+      query: ({ userId }) => ({
+        url: "/course-list",
+        params: { userId },
+      }),
+    }),
   }),
 });
 
@@ -76,4 +86,6 @@ export const {
   useUpdateCourseProgessMutation,
   useUpdateVideoProgessMutation,
   useUpdateVideoChangeIdxMutation,
+  useLazyGetPurchasedCoursesByUserIdQuery,
+  useGetPurchasedCoursesByUserIdQuery,
 } = courseProgressApi;

@@ -57,10 +57,13 @@ export const authSlice = createSlice({
       state.email = "";
       state.isLoggedIn = false;
     },
+    updateProfilePic: (state, action: PayloadAction<string>) => {
+      state.pic = action.payload;
+    },
   },
 });
 
 const authReducer = authSlice.reducer;
 
-export const { signup, login, logout } = authSlice.actions;
+export const { signup, login, logout, updateProfilePic } = authSlice.actions;
 export default authReducer;

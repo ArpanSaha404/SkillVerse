@@ -91,6 +91,18 @@ const Loading = ({ skeletonType = "" }) => {
     );
   }
 
+  if (skeletonType === "myCourses") {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-20 w-full px-8 md:px-20 py-4 mt-12">
+        {[...Array(4)].map((_, idx: number) => (
+          <div key={idx} className="w-full">
+            <Skeleton className="w-full h-40" />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="divCenter flex-col w-full space-y-16 h-screen">
       <div className="w-5/6">

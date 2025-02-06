@@ -54,3 +54,19 @@ export type userCouseProgressListResponse = {
   apiMsg: string;
   userCourseProgressList: courseProgressType[];
 };
+
+export type userPurchasedCoursesDataResponse = {
+  _id: string;
+  name: string;
+  courseId: {
+    createdBy: string;
+    coursePic: string;
+  };
+  isCourseCompleted: boolean;
+  chapters: chapterProgressType[];
+};
+
+export type userPurchasedCoursesResponse = {
+  apiMsg: string;
+  coursesList: userPurchasedCoursesDataResponse[];
+};

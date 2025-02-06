@@ -6,10 +6,12 @@ import {
 import { frontend_URL } from "../../components/lib/utils";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import {
+  changePassDltAccType,
   loginUserType,
   registerUserType,
   responseType,
   sendMailType,
+  updateProfilePicType,
   verifyAccountInputType,
 } from "../../types/user";
 import { signup, login, logout } from "../authSlice";
@@ -151,6 +153,20 @@ export const authApi = createApi({
         body: inputData,
       }),
     }),
+    updateProfile: builder.mutation<responseType, changePassDltAccType>({
+      query: (inptData) => ({
+        url: "/update-profile",
+        method: "PUT",
+        body: inptData,
+      }),
+    }),
+    updatePic: builder.mutation<updateProfilePicType, FormData>({
+      query: (inputData) => ({
+        url: "/update-pic",
+        method: "PATCH",
+        body: inputData,
+      }),
+    }),
   }),
 });
 
@@ -162,4 +178,6 @@ export const {
   useSendMailMutation,
   useVerifyAccountMutation,
   useResetPasswordMutation,
+  useUpdateProfileMutation,
+  useUpdatePicMutation,
 } = authApi;

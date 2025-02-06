@@ -2,6 +2,7 @@ import express from "express";
 import {
   addCourseProgress,
   getCourseProgress,
+  purchasedCoursesbyUserId,
   updateChangeVideoIdx,
   updateChapterProgress,
   updateCourseProgressCompleted,
@@ -17,5 +18,6 @@ router.patch("/chapter-update", isAuthenticated, updateChapterProgress);
 router.patch("/course-update", isAuthenticated, updateCourseProgressCompleted);
 router.patch("/progress-update", isAuthenticated, updateProgressVideo);
 router.patch("/currvideo-update", isAuthenticated, updateChangeVideoIdx);
+router.get("/course-list", isAuthenticated, purchasedCoursesbyUserId);
 
 export default router;

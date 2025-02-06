@@ -63,7 +63,7 @@ const Navbar = () => {
   return (
     <div>
       <Toaster />
-      <div className="flex items-center justify-between bg-transparent mx-auto max-h-24 text-hvrBrwn mx-8 my-2">
+      <div className="flex items-center justify-between bg-transparent max-h-24 text-hvrBrwn mx-8 my-2">
         <Link to="/">
           <div className="divCenter ml-4 md:ml-16 font-bold h-12 text-xl active:scale-90 hover:underline">
             <NotebookPen className="mr-3" />
@@ -103,10 +103,10 @@ const Navbar = () => {
                 <MenubarTrigger>Profile & Courses</MenubarTrigger>
                 <MenubarContent>
                   <MenubarItem className="text-hvrBrwn text-md hover:underline hover:hdrBrwn">
-                    <Link to="/">My Profile</Link>
+                    <Link to="/my-profile">My Profile</Link>
                   </MenubarItem>
                   <MenubarItem className="text-hvrBrwn text-md hover:underline hover:hdrBrwn">
-                    <Link to="/">
+                    <Link to="/my-courses">
                       My Courses{" "}
                       {boughtCourses.length > 0
                         ? "(" + boughtCourses.length + ")"
@@ -275,13 +275,13 @@ const MobileNavbar = () => {
               )}
               {isLoggedIn ? (
                 <div className="flex items-center flex-col justify-start space-y-4">
-                  <Link to="/" className="w-full hover:underline">
+                  <Link to="/my-profile" className="w-full hover:underline">
                     My Profile
                   </Link>
                   <Link to="/courses" className="w-full hover:underline">
                     Explore All Courses
                   </Link>
-                  <Link to="/" className="w-full hover:underline">
+                  <Link to="/my-courses" className="w-full hover:underline">
                     My Courses{" "}
                     {boughtCourses.length > 0
                       ? "(" + boughtCourses.length + ")"
