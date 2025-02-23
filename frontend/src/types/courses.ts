@@ -1,9 +1,9 @@
 export type chapterType = {
   _id: string;
+  id: number;
   chapterTitle: string;
   chapterDesc: string;
   chapterVidURL: string;
-  chapterPublicId: string;
   isChapterPublished: boolean;
 };
 
@@ -15,7 +15,6 @@ export type courseType = {
   subTitle: string;
   desc: string;
   coursePic: string;
-  coursePicPublicId: string;
   categories: string;
   price: number;
   freeChapterIdx: number;

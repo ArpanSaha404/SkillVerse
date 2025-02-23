@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import courseProgress, { ICourseProgress } from "../models/courseProgress";
 import mongoose from "mongoose";
-import courses, { ICourses } from "../models/courses";
 
 export const addCourseProgress = async (
   req: Request,

@@ -103,6 +103,10 @@ const Loading = ({ skeletonType = "" }) => {
     );
   }
 
+  if (skeletonType === "EditCourses") {
+    return <Skeleton className="w-full h-16" />;
+  }
+
   return (
     <div className="divCenter flex-col w-full space-y-16 h-screen">
       <div className="w-5/6">

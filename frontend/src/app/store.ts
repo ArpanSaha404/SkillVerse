@@ -7,6 +7,7 @@ import { courseApi } from "../features/api/courseApi";
 import { categoryApi } from "../features/api/categoryApi";
 import { courseProgressApi } from "../features/api/courseProgressApi";
 import { paymentsApi } from "../features/api/paymentsApi";
+import { teacherApi } from "../features/api/teacherApi";
 
 const persistConfig = {
   key: "root",
@@ -24,7 +25,8 @@ export const store = configureStore({
       courseApi.middleware,
       categoryApi.middleware,
       courseProgressApi.middleware,
-      paymentsApi.middleware
+      paymentsApi.middleware,
+      teacherApi.middleware
     ),
 });
 

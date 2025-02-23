@@ -1,10 +1,10 @@
 import mongoose, { Document } from "mongoose";
 
 export type chapterType = {
+  id: number;
   chapterTitle: string;
   chapterDesc: string;
   chapterVidURL: string;
-  chapterPublicId: string;
   isChapterPublished: boolean;
 };
 
@@ -16,7 +16,6 @@ export interface ICourses extends Document {
   subTitle: string;
   desc: string;
   coursePic: string;
-  coursePicPublicId: string;
   categories: string;
   price: number;
   freeChapterIdx: number;
@@ -54,10 +53,6 @@ const Courses = new mongoose.Schema<ICourses>(
       type: String,
       default: "",
     },
-    coursePicPublicId: {
-      type: String,
-      default: "",
-    },
     categories: {
       type: String,
       required: true,
@@ -74,6 +69,10 @@ const Courses = new mongoose.Schema<ICourses>(
     },
     chapters: [
       {
+        id: {
+          type: Number,
+          required: true,
+        },
         chapterTitle: {
           type: String,
           required: true,

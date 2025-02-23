@@ -6,8 +6,9 @@ import mongoose from "mongoose";
 import userRouter from "./routes/userRouter";
 import courseRoutes from "./routes/courseRoutes";
 import courseProgressRoutes from "./routes/courseProgressRoutes";
-import CategoriesRoutes from "./routes/CategoriesRoutes";
+import categoriesRoutes from "./routes/categoriesRoutes";
 import paymentRoutes from "./routes/paymentRoutes";
+import teacherRoutes from "./routes/teacherRoutes";
 import path from "path";
 import fs from "fs";
 
@@ -35,9 +36,10 @@ if (!fs.existsSync(uploadDir)) {
 
 app.use("/api/users", userRouter);
 app.use("/api/course", courseRoutes);
-app.use("/api/category", CategoriesRoutes);
+app.use("/api/category", categoriesRoutes);
 app.use("/api/course-progress", courseProgressRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/teacher", teacherRoutes);
 
 // Delete Later
 app.get("/test", (_, res: Response) => {

@@ -12,6 +12,10 @@ import ProtectedRoutes from "./components/ProtectedRoutes";
 import UpdateProfile from "./components/UpdateProfile";
 import MyProfile from "./components/MyProfile";
 import MyCourses from "./components/MyCourses";
+import CreatedCourses from "./components/CreatedCourses";
+import NewCourse from "./components/NewCourse";
+import EditCourses from "./components/EditCourses";
+import EditChapters from "./components/EditChapters";
 
 function App() {
   return (
@@ -40,9 +44,17 @@ function App() {
 
           <Route path="/upload" element={<UpdateProfile />} />
           <Route path="/loading" element={<Loading />} />
+
+          {/* Teacher */}
+          <Route path="/created-courses" element={<CreatedCourses />} />
+          <Route path="/create-newcourse" element={<NewCourse />} />
+          <Route path="/edit-course" element={<EditCourses />} />
+          <Route path="/edit-chapter" element={<EditChapters />} />
+
+          {/* All Other Paths to Home */}
           <Route path="*" element={<LandingPage />} />
+          {/* </ProtectedRoutes> */}
         </Routes>
-        {/* </ProtectedRoutes> */}
       </Router>
     </div>
   );

@@ -63,7 +63,7 @@ const Navbar = () => {
   return (
     <div>
       <Toaster />
-      <div className="flex items-center justify-between bg-transparent max-h-24 text-hvrBrwn mx-8 my-2">
+      <div className="flex items-center justify-between bg-transparent max-h-24 text-hvrBrwn px-8 py-2">
         <Link to="/">
           <div className="divCenter ml-4 md:ml-16 font-bold h-12 text-xl active:scale-90 hover:underline">
             <NotebookPen className="mr-3" />
